@@ -1,6 +1,6 @@
-csc309a1
-========
+CSC309 Assignment 1
+====================
 
-The code for the first assignment in CSC309.
+This repo contains the code for the first assignment in CSC309.
 
-Link to description: http://www.cs.toronto.edu/~delara/courses/csc309/
+* [Description of A1](http://www.cs.toronto.edu/~delara/courses/csc309/)
