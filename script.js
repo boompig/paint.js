@@ -8,6 +8,8 @@
  */
 function Script() {
 	// constructor
+	var canvas = document.getElementById("myCanvas");
+	this.context = canvas.getContext("2d");
 	
 	/* Create a buttload of uninstantiated variables */
 	this.tool;
@@ -25,19 +27,6 @@ Script.prototype.setTool = function(toolText) {
 	
 	$("#selectedTool").text(toolText.toUpperCase())
 	this.tool = toolText;
-};
-
-/**
- * Draw stuff on the canvas.
- * Do this as a sanity check that JS is working and canvas is still there.
- */
-Script.prototype.drawOnCanvas = function() {
-	var canvas = document.getElementById("myCanvas");
-	context = canvas.getContext("2d");
-	
-	// everything will be green for now
-	context.fillStyle = "green";
-	// context.fillRect(100, 100, 250, 275);
 };
 
 Script.prototype.updateMousePos = function(x, y) {
@@ -63,12 +52,8 @@ Script.prototype.clearCanvas = function() {
 Script.prototype.updateToolStart = function(x, y) {
 	if (this.tool) {
 		$("#toolStart").text("(" + x +  ", " + y + ")");
-		toolStart = {"x" : x, "y" : y};
+		this.drawStart = {"x" : x, "y" : y};
 		toolStarted += 1;
-		// console.log(toolStart);
-		
-		// start drawing
-		// context.beginPath();
 	} else {
 		alert("You have to select a tool!");	
 	}
@@ -90,38 +75,38 @@ Script.prototype.updateToolEnd = function(x, y) {
 	
 	
 	if(this.tool == "circle") {
-		var centerX = (toolEnd.x + toolStart.x) / 2;
-		var centerY = (toolEnd.y + toolStart.y ) / 2;
+		var centerX = (toolEnd.x + this.drawStart.x) / 2;
+		var centerY = (toolEnd.y + this.drawStart.y ) / 2;
 		
-		var radiusX = Math.abs(toolEnd.x - toolStart.x);
-		var radiusY = Math.abs(toolEnd.y - toolStart.y);
+		var radiusX = Math.abs(toolEnd.x - this.drawStart.x);
+		var radiusY = Math.abs(toolEnd.y - this.drawStart.y);
 		var radius = Math.min(radiusX, radiusY);
 		
-		context.beginPath();
-		context.arc(centerX, centerY, radius, 2* Math.PI, false);
-		context.closePath();
-		context.fillStyle = "red";
-		context.fill();
-		context.lineWidth = 3;
-		context.strokeStyle = "black";
-		context.stroke();
+		this.context.beginPath();
+		this.context.arc(centerX, centerY, radius, 2* Math.PI, false);
+		this.context.closePath();
+		this.context.fillStyle = "red";
+		this.context.fill();
+		this.context.lineWidth = 3;
+		this.context.strokeStyle = "black";
+		this.context.stroke();
 	} else if (this.tool == "rect") {
-		context.beginPath();
+		this.context.beginPath();
 		// note that the third and fourth parameters are width and height resp.
 		
-		context.rect(toolStart.x, toolStart.y, toolEnd.x - toolStart.x, toolEnd.y - toolStart.y);
-		context.fillStyle = "yellow";
-		context.fill();
-		context.lineWidth = 3;
-		context.strokeStyle = "black";
-		context.stroke();
+		this.context.rect(this.drawStart.x, this.drawStart.y, toolEnd.x - this.drawStart.x, toolEnd.y - this.drawStart.y);
+		this.context.fillStyle = "yellow";
+		this.context.fill();
+		this.context.lineWidth = 3;
+		this.context.strokeStyle = "black";
+		this.context.stroke();
 	} else if (this.tool == "line") {
-		context.beginPath();
-		context.lineWidth = 2;
-		context.strokeStyle = "blue";
-		context.moveTo(toolStart.x, toolStart.y);
-		context.lineTo(toolEnd.x, toolEnd.y);
-		context.stroke();
+		this.context.beginPath();
+		this.context.lineWidth = 2;
+		this.context.strokeStyle = "blue";
+		this.context.moveTo(this.drawStart.x, this.drawStart.y);
+		this.context.lineTo(toolEnd.x, toolEnd.y);
+		this.context.stroke();
 	}
 	
 	// show updates
@@ -148,7 +133,7 @@ Script.prototype.addCanvasListeners = function() {
 			$("#toolEndViewer").hide();
 			
 			// clear start and end points
-			toolStart = toolEnd = false;
+			this.drawStart = toolEnd = false;
 			
 			// clear the canvas
 			obj.clearCanvas();
