@@ -16,18 +16,20 @@
 		<script type="text/javascript">
 			// cicles through 0-2
 			var toolStarted = 0;
-			var context, tool, toolStart;
+			var context, toolStart;
 			
 			$(document).ready(function() {
+				var obj = new Script();
+				
 				// add the listener for tool selection
 				$(".drawtoolButton").click(function() {
-					setTool(this.value);
+					obj.setTool(this.value);
 				});
 				
 				// add the listener for interacting with the canvas
-				addCanvasListeners();
+				obj.addCanvasListeners();
 				
-				drawOnCanvas();
+				obj.drawOnCanvas();
 			});
 		</script>
 	</head>
