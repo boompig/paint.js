@@ -4,13 +4,65 @@
 	May 31, 2013 -->
 
 <html>
-	
-	
 	<head>
+		<title>CSC309 - A1</title>
 		
+		<!-- link to google-hosted JQuery -->
+		 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.0/jquery.min.js"></script>
+		<link rel="stylesheet" type="text/css" href="style.css"/>
+		
+		<script type="text/javascript" src="./script.js"></script>
+		
+		<script type="text/javascript">
+			// cicles through 0-2
+			var toolStarted = 0;
+			var context, tool, toolStart;
+			
+			$(document).ready(function() {
+				// add the listener for tool selection
+				$(".drawtoolButton").click(function() {
+					setTool(this.value);
+				});
+				
+				// add the listener for interacting with the canvas
+				addCanvasListeners();
+				
+				drawOnCanvas();
+			});
+		</script>
 	</head>
 	<body>
-		
-		
+		<div id="container">
+			<header>
+				CSC309 Assignment 1
+			</header>
+			
+			<div id="toolbar">
+				<form name="myForm">
+					<input type="radio" class="drawtoolButton" name="drawtool" value="line">Line</button>
+					<input type="radio" class="drawtoolButton" name="drawtool" value="circle">Circle</button>
+					<input type="radio" class="drawtoolButton" name="drawtool" value="rect">Rectangle</button>
+					
+				</form>
+			</div>
+			
+			<canvas id="myCanvas" width="600" height="300">
+				
+			</canvas>
+			
+			<footer>
+				
+				<span id="coordsViewer"><!-- auto-gen text goes here --></span>
+				<div id="selectedToolViewer" style="display: none;">
+						TOOL:&nbsp;<span id="selectedTool"><!-- auto-gen text goes here -->
+					</div>
+				<div id="toolStartViewer" style="display: none;">
+					START:&nbsp;<span id="toolStart"><!-- auto-gen text goes here --></span>
+				</div>
+				<div id="toolEndViewer" style="display: none;">
+					END:&nbsp;<span id="toolEnd"><!-- auto-gen text goes here --></span>
+				</div>
+			</footer>
+		</div>
 	</body>
 </html>
