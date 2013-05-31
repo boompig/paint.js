@@ -1,0 +1,36 @@
+body {
+	width: 100%;
+	font-family: Helvetica, Jura, sans-serif;
+}
+
+#container {
+	width: 80%;
+	margin-left: 20%;
+	float: left;
+	
+	/* for all child elements */
+	text-align: center;
+}
+
+header {
+	width: 100%;
+	font-size: 1.5em;
+	margin-top: 1em;
+	margin-bottom: 1em;
+}
+
+canvas {
+	border-width: 1px;
+	border-color: #000000;
+	border-style: solid;
+}
+
+#toolbar {
+	/* put toolbar on the left */
+	float: left;
+}
+
+#toolbar button {
+	/* each button on own line */
+	display: block;
+}
