@@ -13,3 +13,9 @@ This repo contains the code for the first assignment in CSC309.
 * Resize the shape.
 * Change the shape's color, fill, and outline width.
 * Copy and paste. 
+
+## User shape preferences
+
+* outline colour
+* fill colour
+* outline width

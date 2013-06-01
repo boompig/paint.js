@@ -20,47 +20,69 @@
 			$(document).ready(function() {
 				var obj = new Script();
 				
-				// add the listener for tool selection
-				$(".drawtoolButton").click(function() {
-					obj.setTool(this.value);
-				});
-				
-				// add the listener for interacting with the canvas
+				// add listeners
+				obj.addToolbarListeners();
 				obj.addCanvasListeners();
+				
+				// trigger the listener for the shape (since there is a default selection)
+				$(".drawtoolButton:checked").click();
+				
+				// trigger the listener for the fill colour
+				// update is triggered by all sources, so just pick first one
+				$(".userField").first().keyup();
 			});
 		</script>
 	</head>
 	<body>
 		<div id="container">
-			<header>
+			<header id="pageHeader">
 				CSC309 Assignment 1
 			</header>
 			
 			<div id="toolbar">
+				<header>Toolbar</header>
+				
 				<form name="myForm">
-					<input type="radio" class="drawtoolButton" name="drawtool" value="line">Line</button>
-					<input type="radio" class="drawtoolButton" name="drawtool" value="circle">Circle</button>
-					<input type="radio" class="drawtoolButton" name="drawtool" value="rect">Rectangle</button>
-					
+					<fieldset>
+						<legend>Shape</legend>
+						<label><input type="radio" class="drawtoolButton" name="drawtool" value="line" checked="checked"/>Line</label>
+						<label><input type="radio" class="drawtoolButton" name="drawtool" value="circle" />Circle</label>
+						<label><input type="radio" class="drawtoolButton" name="drawtool" value="rect" />Rectangle</label>
+					</fieldset>
+					<fieldset>
+						<legend>Colours</legend>
+						
+						<label>Fill colour</label>
+						<input type="text" name="fillColour" id="fillColour" class="fill colourField userField" maxlength="6" size="6" value="ffff00" />
+						
+						<label>Line colour</label>
+						<input type="text" name="lineColour" id="lineColour" class="line colourField userField" maxlength="6" size="6" value="000" />
+				
+						<label>Outline width</label>
+						<input type="text" name="outlineWidth" id="outlineWidth" class="userField" maxlength="2" size="2" value="3" min="0" max="40" />
+				
+						<label>Preview</label>
+						<canvas id="colourPreview" height="30" width="30"><!-- will always be empty --></canvas>
+					</fieldset>
+					<fieldset>
+						<legend>Tools</legend>
+						<button type="button" id="clearButton">Clear</button>
+					</fieldset>
 				</form>
 			</div>
 			
-			<canvas id="myCanvas" width="600" height="300">
+			<div id="mainContent">
+				<canvas id="myCanvas" width="550" height="300">
+					<!--obviously this element is initially empty -->
+				</canvas>
 				
-			</canvas>
+				<div>
+					<span id="coordsViewer"><!-- auto-gen text goes here --></span>
+				</div>
+			</div> <!-- end main content -->
 			
 			<footer>
-				
-				<span id="coordsViewer"><!-- auto-gen text goes here --></span>
-				<div id="selectedToolViewer" style="display: none;">
-						TOOL:&nbsp;<span id="selectedTool"><!-- auto-gen text goes here -->
-					</div>
-				<div id="toolStartViewer" style="display: none;">
-					START:&nbsp;<span id="toolStart"><!-- auto-gen text goes here --></span>
-				</div>
-				<div id="toolEndViewer" style="display: none;">
-					END:&nbsp;<span id="toolEnd"><!-- auto-gen text goes here --></span>
-				</div>
+				Written by Daniel Kats
 			</footer>
 		</div>
 	</body>
