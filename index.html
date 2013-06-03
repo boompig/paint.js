@@ -7,7 +7,7 @@
 	<head>
 		<title>CSC309 - A1</title>
 		
-		 <script src="lib/jquery-1.10.1.min.js"></script>
+		<script src="lib/jquery-1.10.1.min.js"></script>
         <script src="lib/kinetic-v4.5.3.min.js"></script>
 		<link rel="stylesheet" type="text/css" href="style.css"/>
 		
@@ -72,9 +72,11 @@
 			</div>
 			
 			<div id="mainContent">
-				<canvas id="myCanvas" width="550" height="300">
-					<!--obviously this element is initially empty -->
-				</canvas>
+				<div id="canvasContainer">
+					<canvas id="myCanvas" width="550" height="300">
+						<!--obviously this element is initially empty -->
+					</canvas>
+				</div>
 				
 				<div>
 					<span id="coordsViewer"><!-- auto-gen text goes here --></span>
