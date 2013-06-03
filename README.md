@@ -19,3 +19,8 @@ This repo contains the code for the first assignment in CSC309.
 * outline colour
 * fill colour
 * outline width
+
+# Libraries Used
+
+* JQuery
+* Kinetic JS
