@@ -1,0 +1,53 @@
+<html>
+	<head>
+		<title>Testing Kinetic.js</title>
+		
+		<script src="lib/jquery-1.10.1.min.js"></script>
+		<script src="lib/kinetic-v4.5.3.min.js"></script>
+		<script src="drawer.js"></script>
+		
+		<script type="text/javascript">
+			/**
+			 * Add listeners to all the buttons.
+			 * drawer - an instance of KineticDrawer
+			 */
+			function addButtonListeners(drawer) {
+				$("#drawCircleButton").click(function() {
+					drawer.drawCircleLayer();
+				});
+				
+				$("#undoDrawButton").click(function() {
+					drawer.undoDraw();
+				});
+				
+				$("#clearButton").click(function() {
+					drawer.clear();
+				});
+			}
+		
+			$(document).ready(function() {
+				obj = new KineticDrawer();
+				addButtonListeners(obj);
+			});
+		</script>
+		
+		<style>
+			#myCanvas {
+				border: 2px solid #000;
+				display: block;
+			}
+			
+			button {
+				/*display: block;*/
+			}
+			
+		</style>
+	</head>
+	<body>
+		<div id="canvasContainer" width="600" height="400"><!-- empty... --></div>
+		<!-- <canvas id="myCanvas" width="600" height="400"><!-- always empty </canvas> -->
+		<button type="button" id="drawCircleButton">Draw Random</button>
+		<button type="button" id="undoDrawButton">Undo</button>
+		<button type="button" id="clearButton">Clear</button>
+	</body>
+</html>
