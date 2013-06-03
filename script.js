@@ -27,10 +27,9 @@ function Script() {
 /**
  * Return true iff the colour given is a valid hex colour.
  * Taken from: http://stackoverflow.com/q/8027423/755934
- * Slightly modified to exclude leading hashtag
  */
 Script.prototype.isColour = function(colour) {
-	var pattern = /(^[0-9A-F]{6}$)|(^[0-9A-F]{3}$)/i;
+	var pattern = /(^#[0-9A-F]{6}$)|(^#[0-9A-F]{3}$)/i;
 	return pattern.test(colour);
 };
 
@@ -62,30 +61,38 @@ Script.prototype.setTool = function(toolText) {
  * Update the div responsible for the colour preview with correct fill and outline values.
  */
 Script.prototype.previewColour = function() {
-	var bg = $(".colourField.fill").val();
-	var outline = $(".colourField.line").val();
+	var bg = "#" + $(".colourField.fill").val();
+	var outline = "#" + $(".colourField.line").val();
 	var w = $("#outlineWidth").val();
+	
+	// console.log("changing preview");
 	
 	if (isNaN(w) || parseInt(w) < 0 || parseInt(w) > parseInt($("#outlineWidth").attr("max"))) {
 		$("#outlineWidth").css("border-color", "red");
 	} else {
 		$("#outlineWidth").css("border-color", "green");
-		// $("#colourPreview").css("border-width", w);
-		this.lineWidth = parseInt(w);
+		if (w != this.lineWidth) {
+			this.lineWidth = parseInt(w);
+			// console.log("changed line width");
+		} 
 	}
 	
 	if(this.isColour(bg)) {
 		$(".colourField.fill").css("border-color", "green");
-		// $("#colourPreview").css("background-color", "#" + bg);
-		this.fillColour = "#" + bg;
+		if (bg != this.fillColour) {
+			this.fillColour = bg;
+			// console.log("changed fill colour");
+		}
 	} else {
 		$(".colourField.fill").css("border-color", "red");
 	}
 	
 	if(this.isColour(outline)) {
 		$(".colourField.line").css("border-color", "green");
-		// $("#colourPreview").css("border-color", "#" + outline);
-		this.lineColour = "#" + outline;
+		if (outline != this.lineColour) {
+			this.lineColour = outline;
+			// console.log("changed line colour");
+		}
 	} else {
 		$(".colourField.line").css("border-color", "red");
 	}
@@ -224,7 +231,7 @@ Script.prototype.addToolbarListeners = function() {
 	var obj = this;
 	
 	// add the listener for tool selection
-	$(".drawtoolButton").click(function() {
+	$(".drawtoolButton").change(function() {
 		obj.setTool(this.value);
 	});
 	
