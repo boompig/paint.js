@@ -8,8 +8,10 @@
  */
 function Script() {
 	// constructor
-	var canvas = $("#myCanvas")[0];
-	this.context = canvas.getContext("2d");
+	// var canvas = $("#myCanvas")[0];
+	// this.context = canvas.getContext("2d");
+	
+	this.drawer = new KineticDrawer();
 	
 	var previewCanvas = $("#colourPreview")[0];
 	this.previewContext = previewCanvas.getContext("2d");
@@ -33,16 +35,6 @@ Script.prototype.isColour = function(colour) {
 	return pattern.test(colour);
 };
 
-/**
- * Given a hex string, turn it to RGB.
- * Return an array [<red>, <blue>, <green>]
- * Taken from: http://stackoverflow.com/q/5623838/755934
- */
-Script.prototype.hexToRGB = function(c) {
-	var hex = c.toString(16);
-    return hex.length == 1 ? "0" + hex : hex;
-};
-
 /************* END GENERAL-PURPOSE UTILS *****************/
 
 /******** REACT TO USER PREFERENCES *****************/
@@ -57,8 +49,10 @@ Script.prototype.setTool = function(toolText) {
 };
 
 /**
- * Preview the colour of the given type.
- * Update the div responsible for the colour preview with correct fill and outline values.
+ * Preview the shape the user is about to draw. Use all user-selected preferences:
+ * 		+ fill colour
+ * 		+ line colour
+ * 		+ shape
  */
 Script.prototype.previewColour = function() {
 	var bg = "#" + $(".colourField.fill").val();
@@ -103,37 +97,59 @@ Script.prototype.previewColour = function() {
 
 /******** END REACT TO USER PREFERENCES *****************/
 
+/**
+ * Update the position of the mouse on the page.
+ * Preview a shape on the canvas, if relevant.
+ */
 Script.prototype.updateMousePos = function(x, y) {
 	$("#coordsViewer").text("(" + x +  ", " + y + ")");
 	
 	if(toolStarted == 1) {
-		// this.context.restore();
-		// add current context back onto the stack for next restore
-		// this.context.save(); 
-		// console.log("saved!");
-		this.drawShape({"x" : x, "y" : y});
+		// this.drawShape({"x" : x, "y" : y});
+		this.drawKineticShape({"x" : x, "y" : y})
 	}
 };
 
 /**
  * Remove all elements from the canvas.
  * If preview is true, then clear the preview canvas instead.
+ * Taken from SOF question: // http://stackoverflow.com/q/10865398/755934
  */
 Script.prototype.clearCanvas = function(preview) {
-	// according to this SOF question, this clears the canvas
-	// http://stackoverflow.com/questions/10865398/how-to-clear-an-html-canvas
-	var canvas = preview ? $("#colourPreview")[0] : $("#myCanvas")[0];	
-	canvas.width = canvas.width;
+	if (preview) {
+		var canvas = $("#colourPreview")[0];
+		canvas.width = canvas.width;
+	} else {
+		this.drawer.clear();
+		$("canvas").not("#colourPreview").css("border", "1px #000 solid");
+		addCanvasListener(this);
+	}
 };
 
 Script.prototype.updateToolStart = function(x, y) {
 	if (this.tool) {
-		// $("#toolStart").text("(" + x +  ", " + y + ")");
 		this.drawStart = {"x" : x, "y" : y};
 		toolStarted += 1;
+		this.drawer.paintStart(this.drawStart);
 	} else {
 		alert("You have to select a tool!");	
 	}
+};
+
+/**
+ * Draw a shape on the Kinetic rendition of the canvas.
+ * Return True iff the shape was drawn. Can return false if:
+ * 		+ `this.tool` is improperly specified
+ * 		+ `this.lineWidth` hasn't been instantiated
+ * 		+ `this.lineColour` hasn't been instantiated
+ * 		+ `this.fillColour` hasn't been instantiated
+ */
+Script.prototype.drawKineticShape = function(drawEnd) {
+	if (! (this.lineWidth && this.lineColour && this.fillColour && ["line", "rect", "circle"].indexOf(this.tool) >= 0)) {
+		return false;
+	}
+	
+	this.drawer.drawShape(this.drawStart, drawEnd, this.tool, this.fillColour, this.lineColour, this.lineWidth);
 };
 
 /**
@@ -149,7 +165,7 @@ Script.prototype.updateToolStart = function(x, y) {
  * Ending position of shape is specified in parameter `drawEnd`. It is a dictionary with the following form:
  * 		{"x" : <integer>, "y" : <integer>}
  * 
- * Can use this to preview the shape by leaving drawEnd as undefined
+ * Can use this to preview the shape by leaving drawEnd as undefined.
  * 
  * Return True iff the shape was drawn. Can return false if:
  * 		+ `this.tool` is improperly specified
@@ -157,19 +173,15 @@ Script.prototype.updateToolStart = function(x, y) {
  * 		+ `this.lineColour` hasn't been instantiated
  * 		+ `this.fillColour` hasn't been instantiated
  */
-Script.prototype.drawShape = function(drawEnd) {
+Script.prototype.drawShape = function() {
+	
 	if (! (this.lineWidth && this.lineColour && this.fillColour && ["line", "rect", "circle"].indexOf(this.tool) >= 0)) {
 		return false;
 	}
 	
-	if(! drawEnd) {
-		context = this.previewContext;
-		drawStart = {"x" : 4, "y" : 4};
-		drawEnd = {"x" : $("#colourPreview").width() - 4, "y" : $("#colourPreview").height() - 4};
-	} else {
-		context = this.context;
-		drawStart = this.drawStart;
-	}
+	context = this.previewContext;
+	drawStart = {"x" : 4, "y" : 4};
+	drawEnd = {"x" : $("#colourPreview").width() - 4, "y" : $("#colourPreview").height() - 4};
 	
 	context.fillStyle = this.fillColour;
 	context.lineWidth = this.lineWidth;
@@ -213,10 +225,9 @@ Script.prototype.drawShape = function(drawEnd) {
  * 		+ Line		-	blue
  */
 Script.prototype.updateToolEnd = function(x, y) {
-	// $("#toolEnd").text("(" + x +  ", " + y + ")");
 	var toolEnd = {"x" : x, "y" : y};
-	this.drawShape(toolEnd);
-	// this.context.save();
+	this.drawKineticShape(toolEnd);
+	this.drawer.finalize();
 	
 	// show updates
 	toolStarted += 1;
@@ -260,46 +271,27 @@ Script.prototype.addToolbarListeners = function() {
 };
 
 /**
- * Add listeners to interact with the canvas
+ * React to a click on the canvas.
+ * canvasX and canvasY are coordinates relative to the canvas.
  */
-Script.prototype.addCanvasListeners = function() {
-	// so can have access to this object in JQuery functions
+Script.prototype.canvasClick = function(canvasX, canvasY) {
 	var obj = this;
 	
-	$("#myCanvas").mousedown(function(event) {
-		if (toolStarted == 0) {
-			// $("#toolEndViewer").hide();
-			obj.updateToolStart(event.clientX - this.offsetLeft, event.clientY - this.offsetTop);
-			// $("#toolStartViewer").show();
-		} else if (toolStarted == 1) {
-			obj.updateToolEnd(event.clientX - this.offsetLeft, event.clientY - this.offsetTop);$("#toolEndViewer").show();
-			// $("#toolEndViewer").show();
-			toolStarted = 0;
-		} else {
-			// this state should actually never be reached
-			alert("error");
-			
-			// hide displays for start and end points
-			// $("#toolStartViewer").hide();
-			// $("#toolEndViewer").hide();
-			
-			// clear start and end points
-			this.drawStart = toolEnd = false;
-			
-			// clear the canvas
-			// obj.clearCanvas();
-			
-			// reset 
-			toolStarted = 0;
-		}
-	});
-	
-	// so can have access to this object inside JQuery function
-	var obj = this;
-	
-	$("#myCanvas").mousemove(function(event) {
-		obj.updateMousePos(event.clientX - this.offsetLeft, event.clientY - this.offsetTop);
-	});
+	if (toolStarted == 0) {
+		obj.updateToolStart(canvasX, canvasY);
+	} else if (toolStarted == 1) {
+		obj.updateToolEnd(canvasX, canvasY);
+		toolStarted = 0;
+	} else {
+		// this state should actually never be reached
+		alert("error");
+		
+		// clear start and end points
+		this.drawStart = toolEnd = false;
+		
+		// reset 
+		toolStarted = 0;
+	}
 };
 
 /************ END CREATING LISTENERS ************************/

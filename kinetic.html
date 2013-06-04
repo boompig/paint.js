@@ -4,16 +4,31 @@
 		
 		<script src="lib/jquery-1.10.1.min.js"></script>
 		<script src="lib/kinetic-v4.5.3.min.js"></script>
+		<script src="utils.js"></script>
 		<script src="drawer.js"></script>
+		<script src="kinetic_paint.js"></script>
+		
+		<link rel="stylesheet" type="text/css" href="drawer_style.css" />
 		
 		<script type="text/javascript">
+			function addMouseListeners(drawer) {
+				$("canvas").css("border", "1px #000 solid");
+				
+				$("#canvasContainer").find("canvas").mousedown(function(event) {
+					var coords = new Utils().toCanvasCoords(event);
+					console.log(coords);
+					drawer.paintStart(coords);
+					// console.log(drawer.stage.getLayers());
+				});
+			}
+		
 			/**
 			 * Add listeners to all the buttons.
 			 * drawer - an instance of KineticDrawer
 			 */
 			function addButtonListeners(drawer) {
-				$("#drawCircleButton").click(function() {
-					drawer.drawCircleLayer();
+				$("#randomDrawButton").click(function() {
+					drawer.drawRandomShape();
 				});
 				
 				$("#undoDrawButton").click(function() {
@@ -27,27 +42,25 @@
 		
 			$(document).ready(function() {
 				obj = new KineticDrawer();
+				// obj = new KineticPaint();
 				addButtonListeners(obj);
+				// addMouseListeners(obj);
+				$("canvas").css("border", "1px #000 solid");
+				
 			});
 		</script>
-		
-		<style>
-			#myCanvas {
-				border: 2px solid #000;
-				display: block;
-			}
-			
-			button {
-				/*display: block;*/
-			}
-			
-		</style>
 	</head>
 	<body>
-		<div id="canvasContainer" width="600" height="400"><!-- empty... --></div>
+		<div id="toolbar">
+			<header>Tools</header>
+			
+			<button type="button" id="randomDrawButton">Draw Random</button>
+			<button type="button" id="undoDrawButton">Undo</button>
+			<button type="button" id="clearButton">Clear</button>
+		</div>
+		
+		<div id="canvasContainer"><!-- empty... --></div>
 		<!-- <canvas id="myCanvas" width="600" height="400"><!-- always empty </canvas> -->
-		<button type="button" id="drawCircleButton">Draw Random</button>
-		<button type="button" id="undoDrawButton">Undo</button>
-		<button type="button" id="clearButton">Clear</button>
+		
 	</body>
 </html>

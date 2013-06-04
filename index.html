@@ -11,18 +11,35 @@
         <script src="lib/kinetic-v4.5.3.min.js"></script>
 		<link rel="stylesheet" type="text/css" href="style.css"/>
 		
+		<script type="text/javascript" src="drawer.js"></script>
 		<script type="text/javascript" src="script.js"></script>
 		
 		<script type="text/javascript">
+			function addCanvasListener(obj) {
+				var mainCanvas = $("canvas").not("#colourPreview");
+				
+				$(mainCanvas).mousemove(function(event) {
+					obj.updateMousePos(Math.round(event.pageX - $(this).offset().left), 
+										Math.round(event.pageY - $(this).offset().top));
+				});
+										
+				$(mainCanvas).mousedown(function(event) {
+					obj.canvasClick(Math.round(event.pageX - $(this).offset().left), 
+										Math.round(event.pageY - $(this).offset().top));
+				});
+			}
+		
 			// cicles through 0-2
 			var toolStarted = 0;
 			
 			$(document).ready(function() {
 				var obj = new Script();
 				
+				$("canvas").not("#colourPreview").css("border", "1px #000 solid");
+				addCanvasListener(obj);
+				
 				// add listeners
 				obj.addToolbarListeners();
-				obj.addCanvasListeners();
 				
 				// trigger the listener for the shape (since there is a default selection)
 				$(".drawtoolButton:checked").change();
@@ -73,9 +90,9 @@
 			
 			<div id="mainContent">
 				<div id="canvasContainer">
-					<canvas id="myCanvas" width="550" height="300">
+					<!-- <canvas id="myCanvas" width="550" height="300"> -->
 						<!--obviously this element is initially empty -->
-					</canvas>
+					<!-- </canvas> -->
 				</div>
 				
 				<div>
