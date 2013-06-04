@@ -2,21 +2,6 @@
  * A class governing drawing on a Kinetic.js rendition of an HTML5 canavs.
  */
 function KineticDrawer() {
-	// main stage, this is the wrapper for everything
-	this.stage = new Kinetic.Stage({
-		container: "canvasContainer",
-		width: 600,
-		height: 400,
-	});
-	
-	this.activeLayer = new Kinetic.Layer();
-	this.stage.add(this.activeLayer);
-	
-	// preview layer goes on top of active layer
-	this.previewLayer = new Kinetic.Layer();
-	this.stage.add(this.previewLayer);
-	
-	
 	this.mode = this.modes.none;
 	this.shapeStack = new Array();
 	
@@ -26,6 +11,44 @@ function KineticDrawer() {
 	this.lineWidth;
 	this.fillColour;
 	this.lineColour;
+	
+	// main stage, this is the wrapper for everything
+	this.stage = new Kinetic.Stage({
+		container: "canvasContainer",
+		width: 600,
+		height: 400,
+	});
+	
+	this.activeLayer = new Kinetic.Layer({
+		id : "activeLayer"
+	});
+	this.stage.add(this.activeLayer);
+	
+	// preview layer goes on top of active layer
+	this.previewLayer = new Kinetic.Layer({
+		id : "previewLayer"
+	});
+	this.stage.add(this.previewLayer);
+	
+	// access this object inside JQuery callback
+	var obj = this;
+	
+	$("#canvasContainer canvas").last().mousedown(function(e) {
+		var pos = obj.toCanvasCoords(e);
+		
+		if (obj.mode == obj.modes.none) {
+			obj.startDrawing(pos);
+		} else {
+			obj.endDrawing(pos);
+		}
+	});
+	
+	$("#canvasContainer canvas").last().mousemove(function(e){
+		if (obj.mode == obj.modes.preview) {
+			var pos = obj.toCanvasCoords(e);
+			obj.previewDrawing(pos);
+		}
+	});
 };
 
 /**
@@ -34,9 +57,7 @@ function KineticDrawer() {
  * 		+ preview - the canvas has been pressed, and now the mouse position acts as the end point for the drawing
  */
 KineticDrawer.prototype.modes = {
-	/* free roaming around canvas, no drawing */
-	"none" : 0, 
-	/* draw anywhere where the mouse pointer is */
+	"none" : 0,
 	"preview" : 1
 };
 
@@ -118,8 +139,8 @@ KineticDrawer.prototype.startDrawing = function(drawStart) {
  * Preview the drawing starting at `this.drawStart` and ending at `drawEnd`.
  */
 KineticDrawer.prototype.previewDrawing = function(drawEnd) {
-	// clear the active layer
-	this.previewLayer.clear();
+	// clear the preview layer
+	this.clear(this.previewLayer);
 	
 	// create the drawing on the active layer
 	this.drawShape(drawEnd, this.previewLayer);
@@ -129,9 +150,10 @@ KineticDrawer.prototype.previewDrawing = function(drawEnd) {
  * Draw something going from `this.drawStart` to `drawEnd`. 
  */
 KineticDrawer.prototype.endDrawing = function(drawEnd) {
-	// make the drawing
-	//TODO!!!
-	// this.previewDrawing();
+	// move the shape from the preview layer to the active layer
+	
+	this.drawShape(drawEnd, this.activeLayer);
+	this.clear(this.previewLayer);
 	
 	// change the mode
 	this.mode = this.modes.none;
@@ -161,8 +183,6 @@ KineticDrawer.prototype.drawRandomShape = function() {
 		"y" : this.drawStart.y + (Math.random() - .5) * 50 + 25
 	};
 	
-	// console.log(drawEnd);
-	
 	this.drawShape(drawEnd, this.activeLayer);
 };
 
@@ -174,8 +194,12 @@ KineticDrawer.prototype.drawRandomShape = function() {
  */
 KineticDrawer.prototype.drawShape = function(drawEnd, layer) {
 	var shape;
-	var id = "shape_" + this.tool + "_" + this.shapeStack.length;
-	this.shapeStack.push(id);
+	
+	// undoing doesn't apply to preview layer
+	if (layer === this.activeLayer) {
+		var id = "shape_" + this.tool + "_" + this.shapeStack.length;
+		this.shapeStack.push(id);
+	}
 	
 	switch (this.tool) {
 		case "circle":
@@ -216,7 +240,6 @@ KineticDrawer.prototype.drawShape = function(drawEnd, layer) {
 			break;
 	}
 	
-	// console.log(shape);
 	layer.add(shape);
 	
 	// redraw the layer
@@ -241,20 +264,23 @@ KineticDrawer.prototype.undoDraw = function() {
 };
 
 /**
- * Clear the canvas by removing all the layers except for the base-layer.
+ * Clear the canvas, or the given layer.
+ * 
  */
-KineticDrawer.prototype.clear = function() {
-	// console.log(this.activeLayer.getChildren());
+KineticDrawer.prototype.clear = function(layer) {
+	if (! layer) {
+		layer = this.activeLayer;
+	}
 	
-	var shapeList = this.activeLayer.getChildren();
+	var shapeList = layer.getChildren();
 	
 	while (shapeList.length > 0) {
 		shapeList.pop().remove();
 	}
 	
-	// this is completely cleared
-	this.shapeStack = new Array();
+	if (layer === this.activeLayer)
+		this.shapeStack = new Array();
 	
 	// redraw to reflect changes
-	this.activeLayer.draw();
+	layer.draw();
 };

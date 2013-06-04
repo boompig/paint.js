@@ -11,16 +11,6 @@
 		<link rel="stylesheet" type="text/css" href="drawer_style.css" />
 		
 		<script type="text/javascript">
-			function addMouseListeners(drawer) {
-				$("canvas").css("border", "1px #000 solid");
-				
-				$("#canvasContainer").find("canvas").mousedown(function(event) {
-					var coords = new Utils().toCanvasCoords(event);
-					console.log(coords);
-					drawer.paintStart(coords);
-					// console.log(drawer.stage.getLayers());
-				});
-			}
 		
 			/**
 			 * Add listeners to all the buttons.
@@ -42,11 +32,8 @@
 		
 			$(document).ready(function() {
 				obj = new KineticDrawer();
-				// obj = new KineticPaint();
 				addButtonListeners(obj);
-				// addMouseListeners(obj);
 				$("canvas").css("border", "1px #000 solid");
-				
 			});
 		</script>
 	</head>
