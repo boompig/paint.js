@@ -123,7 +123,8 @@ KineticDrawer.prototype.startDrawing = function(drawStart) {
 	this.drawStart = drawStart;
 	
 	// generate the random parameters for this drawing
-	this.tool = this.tools[this.randInt(0, this.tools.length)];
+	// this.tool = this.tools[this.randInt(0, this.tools.length)];
+	this.tool = "rect";
 	this.lineWidth = 3; //guaranteed to be random
 	this.fillColour = this.randomColour();
 	
@@ -133,17 +134,35 @@ KineticDrawer.prototype.startDrawing = function(drawStart) {
 		this.lineColour = "#000";
 	
 	this.mode = this.modes.preview;
+	
+	var drawEnd = {"x" : drawStart.x + 1, "y" : drawStart.y + 1};
+	// this.previewDrawing(drawEnd);
 };
 
 /**
  * Preview the drawing starting at `this.drawStart` and ending at `drawEnd`.
  */
 KineticDrawer.prototype.previewDrawing = function(drawEnd) {
+	if (this.previewLayer.getChildren().length == 0 || this.tool == "circle") {
+		this.drawShape(drawEnd, this.previewLayer);
+	} else {
+		var shape = this.previewLayer.get("#previewShape")[0];
+		
+		
+		var w = drawEnd.x - this.drawStart.x;
+		var h = drawEnd.y - this.drawStart.y;
+		
+		shape.setWidth(w);
+		shape.setHeight(h);
+		this.previewLayer.draw();
+	}
 	// clear the preview layer
-	this.clear(this.previewLayer);
+	// this.clear(this.previewLayer);
+	
+	// can actually do this quite nicely
 	
 	// create the drawing on the active layer
-	this.drawShape(drawEnd, this.previewLayer);
+	
 };
 
 /**
@@ -193,12 +212,14 @@ KineticDrawer.prototype.drawRandomShape = function() {
  * If fill, line colours, strokeWidth are not determined, pick them randomly.
  */
 KineticDrawer.prototype.drawShape = function(drawEnd, layer) {
-	var shape;
+	var shape, id;
 	
 	// undoing doesn't apply to preview layer
 	if (layer === this.activeLayer) {
-		var id = "shape_" + this.tool + "_" + this.shapeStack.length;
+		id = "shape_" + this.tool + "_" + this.shapeStack.length;
 		this.shapeStack.push(id);
+	} else {
+		id = "previewShape";
 	}
 	
 	switch (this.tool) {
@@ -239,6 +260,17 @@ KineticDrawer.prototype.drawShape = function(drawEnd, layer) {
 			alert("Unknown shape name: " + this.tool);
 			break;
 	}
+	
+	// var obj = this;
+	// if (layer === this.previewLayer) {
+		// console.log("attached event");
+// 		
+		// shape.on("mousemove", function(evt) {
+			// console.log(evt.targetNode);
+			// // console.log("hello world");
+			// // obj.previewDrawing(obj.toCanvasCoords(e));
+		// });
+	// }
 	
 	layer.add(shape);
 	
