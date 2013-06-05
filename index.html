@@ -1,108 +1,86 @@
 <!DOCTYPE html>
 
-<!-- Written by Daniel Kats
-	May 31, 2013 -->
-
 <html>
 	<head>
-		<title>CSC309 - A1</title>
+		<title>JS Test</title>
 		
-		<script src="lib/jquery-1.10.1.min.js"></script>
-        <script src="lib/kinetic-v4.5.3.min.js"></script>
 		<link rel="stylesheet" type="text/css" href="style.css"/>
 		
-		<script type="text/javascript" src="drawer.js"></script>
-		<script type="text/javascript" src="script.js"></script>
+		<script src="lib/jquery-1.10.1.min.js"></script>
 		
-		<script type="text/javascript">
-			function addCanvasListener(obj) {
-				var mainCanvas = $("canvas").not("#colourPreview");
-				
-				$(mainCanvas).mousemove(function(event) {
-					obj.updateMousePos(Math.round(event.pageX - $(this).offset().left), 
-										Math.round(event.pageY - $(this).offset().top));
-				});
-										
-				$(mainCanvas).mousedown(function(event) {
-					obj.canvasClick(Math.round(event.pageX - $(this).offset().left), 
-										Math.round(event.pageY - $(this).offset().top));
-				});
+		<!-- general-purpose utilities -->
+		<script src="vector.js"></script>
+		<script src="utils.js"></script>
+		<script src="shape.js"></script>
+		<script src="toolbar.js"></script>
+		
+		
+		<style>
+			#canvasContainer {
+				display: inline-block;
+				position: relative;
+				width: 600px;
+				height: 300px;
 			}
 		
-			// cicles through 0-2
-			var toolStarted = 0;
+			#canvasContainer canvas {
+				border: 1px solid #000;
+				background: none repeat scroll 0 0 transparent;
+				position: absolute;
+				margin: 0;
+				padding: 0;
+				display: block;
+			}
 			
-			$(document).ready(function() {
-				var obj = new Script();
-				
-				$("canvas").not("#colourPreview").css("border", "1px #000 solid");
-				addCanvasListener(obj);
-				
-				// add listeners
-				obj.addToolbarListeners();
-				
-				// trigger the listener for the shape (since there is a default selection)
-				$(".drawtoolButton:checked").change();
-				
-				// trigger the listener for the fill colour
-				// update is triggered by all sources, so just pick first one
-				$(".userField").first().keyup();
-			});
-		</script>
+			button {
+				display: block;
+			}
+		</style>
 	</head>
+	
 	<body>
-		<div id="container">
-			<header id="pageHeader">
-				CSC309 Assignment 1
-			</header>
+		<div id="toolbar">
+			<header>Toolbar</header>
 			
-			<div id="toolbar">
-				<header>Toolbar</header>
-				
-				<form name="myForm">
-					<fieldset>
-						<legend>Shape</legend>
-						<label><input type="radio" class="drawtoolButton" name="drawtool" value="line" checked="checked"/>Line</label>
-						<label><input type="radio" class="drawtoolButton" name="drawtool" value="circle" />Circle</label>
-						<label><input type="radio" class="drawtoolButton" name="drawtool" value="rect" />Rectangle</label>
-					</fieldset>
-					<fieldset>
-						<legend>Colours</legend>
-						
-						<label>Fill colour</label>
-						<input type="text" name="fillColour" id="fillColour" class="fill colourField userField" maxlength="6" size="6" value="ffff00" />
-						
-						<label>Line colour</label>
-						<input type="text" name="lineColour" id="lineColour" class="line colourField userField" maxlength="6" size="6" value="000" />
-				
-						<label>Outline width</label>
-						<input type="text" name="outlineWidth" id="outlineWidth" class="userField" maxlength="2" size="2" value="3" min="0" max="40" />
-				
-						<label>Preview</label>
-						<canvas id="colourPreview" height="30" width="30"><!-- will always be empty --></canvas>
-					</fieldset>
-					<fieldset>
-						<legend>Tools</legend>
-						<button type="button" id="clearButton">Clear</button>
-					</fieldset>
-				</form>
-			</div>
+			<form name="myForm">
+				<fieldset>
+					<legend>Tool</legend>
+					<label><input type="radio" class="drawtoolButton" name="drawtool" value="select" />Select</label>
+					<label><input type="radio" class="drawtoolButton" name="drawtool" value="line" checked="checked"/>Line</label>
+					<label><input type="radio" class="drawtoolButton" name="drawtool" value="circle" />Circle</label>
+					<label><input type="radio" class="drawtoolButton" name="drawtool" value="rect" />Rectangle</label>
+				</fieldset>
+				<fieldset>
+					<legend>Colours</legend>
+					
+					<label>Fill colour</label>
+					<input type="text" name="fillColour" id="fillColour" class="fill colourField userField" maxlength="6" size="6" value="ffff00" />
+					
+					<label>Line colour</label>
+					<input type="text" name="lineColour" id="lineColour" class="line colourField userField" maxlength="6" size="6" value="000" />
 			
-			<div id="mainContent">
-				<div id="canvasContainer">
-					<!-- <canvas id="myCanvas" width="550" height="300"> -->
-						<!--obviously this element is initially empty -->
-					<!-- </canvas> -->
-				</div>
-				
-				<div>
-					<span id="coordsViewer"><!-- auto-gen text goes here --></span>
-				</div>
-			</div> <!-- end main content -->
+					<label>Outline width</label>
+					<input type="text" name="outlineWidth" id="outlineWidth" class="userField" maxlength="2" size="2" value="3" min="0" max="40" />
 			
-			<footer>
-				Written by Daniel Kats
-			</footer>
+					<label>Preview</label>
+					<canvas id="colourPreview" height="30" width="30"><!-- will always be empty --></canvas>
+				</fieldset>
+				<fieldset>
+					<legend>Options</legend>
+					<button type="button" id="clearButton">Clear</button>
+					<button type="button" id="randomColourButton">Random Fill Colour</button>
+					<button type="button" id="eraseShapeButton">Erase</button>
+				</fieldset>
+			</form>
+		</div> <!-- end toolbar -->
+		
+		<div id="canvasContainer">
+			<canvas id="baseLayer" width="600" height="300"><!-- nothing here --></canvas>
+			<canvas id="previewLayer" width="600", height="300"><!-- nothing here--></canvas>
 		</div>
+		<div id="canvasCoords"><!-- auto-gen --></div>
+		
+		<!-- <script src="kinetic_test.js" defer="defer"></script> -->
+		<script src="canvas_test.js" defer="defer"></script>
 	</body>
 </html>
