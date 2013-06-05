@@ -1,2 +1,5 @@
 # ignore project file
 .project
+
+# ignore private TODO annotations
+TODO
