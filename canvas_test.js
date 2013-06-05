@@ -1,6 +1,7 @@
 var drag = false;
 var util = new Utils(); // for quick reference to utils
 var toolbar = new Toolbar();
+var mouseStart = false; // for check of whether this is click or drag
 
 function Tester() {
 	this.previewCanvas = $("#previewLayer")[0];
@@ -43,17 +44,14 @@ Tester.prototype.endPreviewShape = function (drawEnd) {
 	shape.uid = this.uid;
 	this.uid++;
 	
+	this.shapeStack.push(shape);
     shape.draw(this.baseLayer);
-    this.shapeStack.push(shape);
-    this.clear(t.previewCanvas);
+    
+    this.clear(this.previewCanvas);
     drag = false;
     
     // select the newly-added shape
     this.selectShape(shape);
-    
-    
-    console.log("Added: ");
-    console.log(this.selectedShape);
 };
 
 /**
@@ -61,6 +59,9 @@ Tester.prototype.endPreviewShape = function (drawEnd) {
  * Try to select top-most elements first.
  */
 Tester.prototype.trySelect = function (selectPos) {
+	// deselect the current shape before picking up a new one
+	this.deselectShape();
+	
 	var shape, i = this.shapeStack.length - 1;
 	
 	while (i >= 0) {
@@ -78,18 +79,12 @@ Tester.prototype.trySelect = function (selectPos) {
 		
 		i--;
 	}
-	
-	// if nothing
-	this.deselectShape();
 };
-
-Tester.prototype.draw
 
 /**
  * Redraw all the objects on the main canvas.
  */
 Tester.prototype.redraw = function () {
-	// console.log(this.shapeStack);
 	util.clearCanvas(this.baseCanvas);
 	
     for (var i = 0; i < this.shapeStack.length; i++) {
@@ -141,6 +136,21 @@ Tester.prototype.eraseSelectedShape = function () {
  */
 Tester.prototype.selectShape = function (shape, redraw) {
 	this.selectedShape = shape;
+	
+	// remove from the main canvas
+	var i = this.shapeStack.length - 1;
+	while (i >= 0) {
+		if (this.shapeStack[i].uid === this.selectedShape.uid) {
+			this.shapeStack.splice(i, 1);
+			break;
+		}
+		
+		i--;
+	}
+	
+	// add to the preview canvas
+	this.selectedShape.draw(this.previewLayer);
+	
 	$("#eraseShapeButton").removeAttr("disabled");
 };
 
@@ -148,8 +158,30 @@ Tester.prototype.selectShape = function (shape, redraw) {
  * Deselect all shapes.
  */
 Tester.prototype.deselectShape = function (enable) {
+	if (this.selectedShape) {
+		// add the selected shape back to the main canvas
+		this.selectedShape.draw(this.baseLayer);
+	    this.shapeStack.push(this.selectedShape);
+	    this.clear(this.previewCanvas);
+	}
+	
 	this.selectedShape = false;
 	$("#eraseShapeButton").attr("disabled", "disabled");
+};
+
+/**
+ * Move the currently selected shape by the mouse delta
+ * @param {Vector} delta The vector by which to move.
+ */
+Tester.prototype.moveSelectedShape = function (delta) {
+	if (! this.selectedShape) {
+		alert("No shape selected")
+		return;
+	}
+	
+	this.clear(this.previewCanvas);
+	this.selectedShape.move(delta);
+	this.selectedShape.draw(this.previewLayer);
 };
 
 var t = new Tester();
@@ -174,7 +206,14 @@ $(".drawtoolButton").change(function() {
 
 $("#previewLayer").mousedown(function (e) {
 	if (t.tool == "select") {
-		t.trySelect(util.toCanvasCoords(e));
+		var coords = util.toCanvasCoords(e)
+		
+		t.trySelect(coords);
+		if (t.selectedShape) {
+			mouseStart = coords;
+		} else {
+			console.log("none selected");
+		}
 	} else {
 		t.startPreview(util.toCanvasCoords(e));	
 	}
@@ -183,15 +222,24 @@ $("#previewLayer").mousedown(function (e) {
 $("#previewLayer").mousemove(function (e) {
 	var coords = util.toCanvasCoords(e);
 	$("#canvasCoords").text(coords.toString());
-	
-    if (drag) {
+
+	if(t.tool == "select" && t.selectedShape && mouseStart) {
+		var mouseDelta = util.toCanvasCoords(e).sub(mouseStart);
+		t.moveSelectedShape(mouseDelta);
+		mouseStart = coords;
+	} else if (t.tool == "select") {
+		// console.log(t.selectedShape);
+		// console.log(mouseStart);
+	}else if (drag) {
         t.previewShape(coords);
     }
 });
 
 $("#previewLayer").mouseup(function (e) {
-	if (drag) {
-		if (t.tool != "select")
-   			t.endPreviewShape(util.toCanvasCoords(e));
+	if (t.tool == "select" && t.selectedShape && mouseStart) {
+		t.deselectShape();
+		mouseStart = false;
+	} else if (drag) {
+   		t.endPreviewShape(util.toCanvasCoords(e));
 	}
 });

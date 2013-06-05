@@ -1,3 +1,12 @@
+/**
+ * Create a new shape with all the given parameters.
+ * @param {String} name The shape name - one of "line", "rect", "circle"
+ * @param {Vector} drawStart The starting point of the bounding rect (point a)
+ * @param {Vector} drawEnd The ending point of the bounding rect (point b)
+ * @param {String} lineColour A hex for the line colour
+ * @param {number} lineWidth An int for the line width
+ * @param {String} fillColour A hex for the fill colour
+ */
 function Shape(name, drawStart, drawEnd, lineColour, lineWidth, fillColour) {
 	// we're going to order drawStart and drawEnd based on x-coordinates
 	// drawStart goes first, with lowest x-coordinate
@@ -35,8 +44,22 @@ function Shape(name, drawStart, drawEnd, lineColour, lineWidth, fillColour) {
 }
 
 /**
+ * Move the shape by the given deltas.
+ * By that, it means modify the shape.
+ * @param {Vector} moveVector The amount by which to move the shape.
+ */
+Shape.prototype.move = function(moveVector) {
+	this.drawStart = this.drawStart.add(moveVector);
+	this.drawEnd = this.drawEnd.add(moveVector);
+	
+	if (this.name == "circle") {
+		this.center = this.center.add(moveVector);
+	}
+};
+
+/**
  * Return True iff the point intersects the shape.
- * @param p The point being tested.
+ * @param {Vector} p The point being tested.
  */
 Shape.prototype.intersects = function(p) {
 	// rename for ease of use
@@ -51,11 +74,14 @@ Shape.prototype.intersects = function(p) {
 		case "line":
 			var closeEnough = 9; // has to be this close to the line
 			var dist = util.minLineSegmentDist(this, p);
-			console.log(dist);
 			return dist <= closeEnough;
 	}
 };
 
+/**
+ * Prepare the given context to start drawing.
+ * Called internally only.
+ */
 Shape.prototype.prepareDraw = function(context) {
 	context.save();
 	if (this.fillColour)
@@ -64,11 +90,18 @@ Shape.prototype.prepareDraw = function(context) {
 	context.lineWidth = this.lineWidth;
 };
 
+/**
+ * Finish the drawing.
+ * Called internally only.
+ */
 Shape.prototype.endDraw = function(context) {
 	context.stroke();
 	context.restore();
 };
 
+/**
+ * Draw the current shape on the given context.
+ */
 Shape.prototype.draw = function(context) {
 	switch(this.name) {
 		case "line":
@@ -83,6 +116,10 @@ Shape.prototype.draw = function(context) {
 	}
 };
 
+/**
+ * Draw a line on the given context.
+ * @param {Object} context
+ */
 Shape.prototype.drawLine = function(context) {
 	this.prepareDraw(context);
 	
@@ -94,6 +131,10 @@ Shape.prototype.drawLine = function(context) {
 	this.endDraw(context);
 };
 
+/**
+ * Draw a circle on the given context.
+ * @param {Object} context
+ */
 Shape.prototype.drawCircle = function(context) {
 	this.prepareDraw(context);
 	

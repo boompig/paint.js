@@ -1,7 +1,7 @@
 /**
  * Create a new vector (or point) object in 2D space.
- * @param x The x-coordinate
- * @param y The y-coordinate
+ * @param {number} x The x-coordinate
+ * @param {number} y The y-coordinate
  */
 function Vector(x, y) {
 	this.x = x;
@@ -24,7 +24,7 @@ Vector.prototype.size = function() {
 
 /**
  * Return the dot-product of this vector and v2.
- * @param Vector v2 The other vector.
+ * @param {Vector} v2 The other vector.
  */
 Vector.prototype.dotProduct = function(v2) {
 	return (v2.x * this.x) + (v2.y * this.y);
@@ -32,7 +32,7 @@ Vector.prototype.dotProduct = function(v2) {
 
 /**
  * Return scalar projection of this vector onto v2.
- * @param Vector v2 The other vector.
+ * @param {Vector} v2 The other vector.
  */
 Vector.prototype.projectScalar = function(v2) {
 	// `this <dot> v2` / || v2 ||
@@ -41,7 +41,7 @@ Vector.prototype.projectScalar = function(v2) {
 
 /**
  * Return the resulting vector after performing `this - v2`
- * @param Vector v2 The other vector.
+ * @param {Vector} v2 The other vector.
  */
 Vector.prototype.sub = function(v2) {
 	return new Vector(this.x - v2.x, this.y - v2.y);
@@ -49,7 +49,7 @@ Vector.prototype.sub = function(v2) {
 
 /**
  * Return the resulting vector after performing `this + v2`
- * @param Vector v2 The other vector.
+ * @param {Vector} v2 The other vector.
  */
 Vector.prototype.add = function(v2) {
 	return new Vector(this.x + v2.x, this.y + v2.y);
@@ -57,7 +57,7 @@ Vector.prototype.add = function(v2) {
 
 /**
  * Scalar multiply this vector by c
- * @param c The scalar.
+ * @param {number} c The scalar.
  */
 Vector.prototype.mul = function(c) {
 	return new Vector(c * this.x, c * this.y);
@@ -72,4 +72,11 @@ Vector.prototype.perp = function() {
 
 Vector.prototype.toString = function() {
 	return "(" + Math.round(this.x) + ", " + Math.round(this.y) + ")"; 
+};
+
+/**
+ * Return True iff this vector is the zero vector.
+ */
+Vector.prototype.isZero = function () {
+	return this.x === 0 && this.y === 0;
 };
