@@ -10,6 +10,7 @@ function Vector(x, y) {
 
 /**
  * Return the squared magnitude of this vector.
+ * @returns {number}
  */
 Vector.prototype.sizeSquared = function() {
 	return Math.pow(this.x, 2) + Math.pow(this.y, 2);
@@ -17,6 +18,7 @@ Vector.prototype.sizeSquared = function() {
 
 /**
  * Return the magnitude of this vector.
+ * @returns {number}
  */
 Vector.prototype.size = function() {
 	return Math.sqrt(this.sizeSquared());
@@ -25,6 +27,7 @@ Vector.prototype.size = function() {
 /**
  * Return the dot-product of this vector and v2.
  * @param {Vector} v2 The other vector.
+ * @returns {number}
  */
 Vector.prototype.dotProduct = function(v2) {
 	return (v2.x * this.x) + (v2.y * this.y);
@@ -33,6 +36,7 @@ Vector.prototype.dotProduct = function(v2) {
 /**
  * Return scalar projection of this vector onto v2.
  * @param {Vector} v2 The other vector.
+ * @returns {number}
  */
 Vector.prototype.projectScalar = function(v2) {
 	// `this <dot> v2` / || v2 ||
@@ -42,6 +46,7 @@ Vector.prototype.projectScalar = function(v2) {
 /**
  * Return the resulting vector after performing `this - v2`
  * @param {Vector} v2 The other vector.
+ * @returns {Vector}
  */
 Vector.prototype.sub = function(v2) {
 	return new Vector(this.x - v2.x, this.y - v2.y);
@@ -50,6 +55,7 @@ Vector.prototype.sub = function(v2) {
 /**
  * Return the resulting vector after performing `this + v2`
  * @param {Vector} v2 The other vector.
+ * @returns {Vector}
  */
 Vector.prototype.add = function(v2) {
 	return new Vector(this.x + v2.x, this.y + v2.y);
@@ -58,25 +64,45 @@ Vector.prototype.add = function(v2) {
 /**
  * Scalar multiply this vector by c
  * @param {number} c The scalar.
+ * @returns {Vector}
  */
 Vector.prototype.mul = function(c) {
 	return new Vector(c * this.x, c * this.y);
 };
 
 /**
- * Return the vector perpendicular to this one.
+ * Return the string representation of this Vector
+ * @returns {String}
  */
-Vector.prototype.perp = function() {
-	return new Vector(this.y, -1 * this.x);
-};
-
 Vector.prototype.toString = function() {
 	return "(" + Math.round(this.x) + ", " + Math.round(this.y) + ")"; 
 };
 
 /**
  * Return True iff this vector is the zero vector.
+ * @returns {boolean}
  */
 Vector.prototype.isZero = function () {
 	return this.x === 0 && this.y === 0;
+};
+
+/**
+ * Return a vector copy of itself
+ * @returns {Vector}
+ */
+Vector.prototype.copy = function () {
+	return new Vector(this.x, this.y);
+};
+
+/**
+ * Return a new unit vector in the same direction as this vector.
+ * @returns {Vector}
+ */
+Vector.prototype.unitVector = function() {
+	var v = this.copy();
+	
+	if (v.isZero())
+		return v;
+	else
+		return v.mul(1 / v.size());
 };

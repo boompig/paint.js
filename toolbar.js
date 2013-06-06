@@ -143,7 +143,11 @@ Toolbar.prototype.previewColour = function() {
 	if (allGood) {
 		// there is a different 'good' configuration from what was there before
 		this.changed = true;
-		$("#applyColoursButton").removeAttr("disabled");
+		
+		// if there is a 'model', we can re-enable the apply button
+		if (this.currentShape)
+			$("#applyColoursButton").removeAttr("disabled");
+			
 		var context = canvas.getContext("2d"), shape;
 		
 		if (this.tool == "select" && this.currentShape) {
@@ -157,8 +161,6 @@ Toolbar.prototype.previewColour = function() {
 		
 		shape.draw(context);
 	} else {
-		// disable it if one of the settings is bad
-		console.log("bad settings");
 		$("#applyColoursButton").attr("disabled", "disabled");
 	}
 };

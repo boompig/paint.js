@@ -140,7 +140,7 @@ Tester.prototype.clear = function (canvas) {
 Tester.prototype.eraseSelectedShape = function () {
 	if (this.selectedShape) {
 		this.clear(this.previewCanvas);
-		this.selectedShape = false;
+		this.selectedShape = false; // remove shape before deselecting it to prevent it from being re-added
 		this.deselectShape();
 	} else {
 		alert("No shape selected");
@@ -190,6 +190,11 @@ Tester.prototype.deselectShape = function () {
 	}
 	
 	this.selectedShape = false;
+	
+	// update the toolbar
+	toolbar.currentShape = false;
+	toolbar.previewColour();
+	
 	$("#eraseShapeButton").attr("disabled", "disabled");
 	$("#copyShapeButton").attr("disabled", "disabled");
 	$("#applyColoursButton").attr("disabled", "disabled");
@@ -215,9 +220,43 @@ Tester.prototype.moveSelectedShape = function (delta) {
  */
 Tester.prototype.copySelectedShape = function () {
 	var canvasCenter = new Vector(this.baseCanvas.width / 2, this.baseCanvas.height / 2);
-	var shape = this.selectedShape;
-	var shapeCenter = shape.getCenter();
+	var shapeCenter = this.selectedShape.getCenter();
+	
+	// offset from original shape
+	var delta = new Vector(20, 20);
+	
+	// vector from shape center to canvas center
+	var v = canvasCenter.sub(shapeCenter);
+	
+	if (! v.isZero()) {
+		delta = v.unitVector().mul(delta.size());
+	}
+	
+	var newShape = this.selectedShape.copy();
+	newShape.move(delta);
+	
+	// deselect the old shape
+	this.deselectShape();
+	
+	// select the new shape
+	this.selectShape(newShape);
 };
+
+/**
+ * Change the colouring of the currently selected shape.
+ */
+Tester.prototype.recolourSelectedShape = function () {
+	if (toolbar.changed && this.selectedShape) {
+		// change properties of the selected shape
+		this.selectedShape.setColours(toolbar.lineColour, toolbar.lineWidth, toolbar.fillColour);
+		
+		// redraw the shape on the preview layer
+		this.clear(this.previewLayer);
+		this.selectedShape.draw(this.previewLayer);
+	} else {
+		alert("Error - nothing selected");
+	}
+}
 
 var t = new Tester();
 
@@ -233,9 +272,6 @@ $("#clearButton").click(function () {
 });
 
 $("#copyShapeButton").click(function() {
-	// copy the currently selected shape
-	// depends on the p
-	
 	if(t.selectedShape) {
 		t.copySelectedShape();
 	} else {
@@ -248,16 +284,7 @@ $("#eraseShapeButton").click(function() {
 });
 
 $("#applyColoursButton").click(function() {
-	if (toolbar.changed && t.selectedShape) {
-		// change properties of the selected shape
-		t.selectedShape.setColours(toolbar.lineColour, toolbar.lineWidth, toolbar.fillColour);
-		
-		// redraw
-		t.clear(t.previewLayer);
-		t.selectedShape.draw(t.previewLayer);
-	} else {
-		alert("Error - nothing selected");
-	}
+	t.recolourSelectedShape();
 });
 
 /********************* End toolbar button events ********************/
@@ -272,8 +299,7 @@ $("#previewLayer").mousedown(function (e) {
 		if (t.selectedShape) {
 			mouseStart = coords;
 		} else {
-			toolbar.currentShape = false;
-			toolbar.previewColour();
+			t.deselectShape();
 		}
 	} else {
 		t.deselectShape();
