@@ -14,7 +14,6 @@ function Tester() {
 	this.baseLayer = this.baseCanvas.getContext("2d");
 	
 	this.shapeStack = new Array();
-	this.uid = 0; // unique ID for each shape, only goes up
 	
 	/** Instantiate a bunch of vars (it's fine if they are undefined for now) */
 	this.drawStart;
@@ -51,10 +50,6 @@ Tester.prototype.previewShape = function (drawEnd) {
  */
 Tester.prototype.endPreviewShape = function (drawEnd) {
 	var shape = new Shape(this.tool, this.drawStart, drawEnd, this.lineColour, this.lineWidth, this.fillColour);
-	
-	// for finding that shape later
-	shape.uid = this.uid;
-	this.uid++;
 	
 	this.shapeStack.push(shape);
     shape.draw(this.baseLayer);
@@ -155,6 +150,9 @@ Tester.prototype.selectShape = function (shape) {
 	
 	// add to the preview canvas
 	this.selectedShape.draw(this.previewLayer);
+	
+	// preview the shape on the toolbar preview canvas
+	toolbar.setPreview(this.selectedShape);
 	
 	$("#eraseShapeButton").removeAttr("disabled");
 };

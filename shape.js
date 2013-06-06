@@ -1,3 +1,6 @@
+/** Used to assign unique IDs to shapes. */
+var uid = 0;
+
 /**
  * Create a new shape with all the given parameters.
  * @param {String} name The shape name - one of "line", "rect", "circle"
@@ -17,13 +20,24 @@ function Shape(name, drawStart, drawEnd, lineColour, lineWidth, fillColour) {
 	}
 	
 	this.name = name;
-	this.drawStart = drawStart;
-	this.drawEnd = drawEnd;
 	this.lineColour = lineColour;
 	this.lineWidth = lineWidth;
+	this.uid = uid++;
 	
 	if (fillColour)
 		this.fillColour = fillColour
+	
+	this.setSize(drawStart, drawEnd);
+}
+
+/**
+ * Set the size of the shape by changing the endpoints.
+ * @param {Vector} drawStart The new starting point for the shape
+ * @param {Vector} drawEnd The new ending point for the shape
+ */
+Shape.prototype.setSize = function(drawStart, drawEnd) {
+	this.drawStart = drawStart;
+	this.drawEnd = drawEnd;
 	
 	switch (this.name) {
 		case "rect":
@@ -41,7 +55,7 @@ function Shape(name, drawStart, drawEnd, lineColour, lineWidth, fillColour) {
 			// do nothing
 			break;
 	}
-}
+};
 
 /**
  * Move the shape by the given deltas.
@@ -155,4 +169,11 @@ Shape.prototype.drawRect = function(context) {
 	context.fill();
 	
 	this.endDraw(context);
+};
+
+/**
+ * Return a copy of this shape.
+ */
+Shape.prototype.copy = function() {
+	return new Shape(this.name, this.drawStart, this.drawEnd, this.lineColour, this.lineWidth, this.fillColour);
 };

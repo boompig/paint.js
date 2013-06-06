@@ -2,22 +2,26 @@
  * Make sure that all the info from the toolbar is kept up to date
  */
 
+/**
+ * Wrapper for the toolbar.
+ */
 function Toolbar() {
+	/** how much off the preview canvas border to draw the preview shape */
+	this.offset = 2;
+	
 	/** uninstantiated stuff */
 	this.tool;
 	this.fillColour;
 	this.lineColour;
 	this.lineWidth;	
 	
-	// make listeners
+	/* make listeners */
 	var obj = this;
 	
-	// change the tool
 	$(".drawtoolButton").change(function() {
 		obj.setTool(this.value);
 	});
 	
-	// change colour or line width
 	$(".userField").each(function(i, elem) {
 		$(elem).keyup(function(e) {
 			obj.previewColour();
@@ -28,17 +32,36 @@ function Toolbar() {
 		});
 	});
 	
-	// trigger listeners
+	/* trigger listeners */
 	$(".drawtoolButton:checked").change();
 }
 
 /**
  * Update the display which shows which tool is selected.
- * The mode is given.
+ * @param {String} toolText The name of the tool.
  */
 Toolbar.prototype.setTool = function(toolText) {
 	this.tool = toolText;
 	this.previewColour(); 
+};
+
+/**
+ * Set the preview to show details of selected shape.
+ * @param {Shape} shape The selected shape.
+ */
+Toolbar.prototype.setPreview = function(shape) {
+	var canvas = $("#colourPreview")[0];
+	var context = canvas.getContext("2d");
+	
+	var newShape = shape.copy();
+	console.log(newShape);
+	
+	var drawStart = new Vector(this.offset, this.offset);
+	var drawEnd = new Vector(canvas.width - this.offset, canvas.height - this.offset);
+	newShape.setSize(drawStart, drawEnd);
+	
+	util.clearCanvas(canvas);
+	newShape.draw(context);
 };
 
 /**
@@ -92,13 +115,10 @@ Toolbar.prototype.previewColour = function() {
 	util.clearCanvas(canvas);
 	
 	if (allGood) {
-		// console.log("redraw");
 		var context = canvas.getContext("2d");
-		var offset = 2;
-		var drawStart = new Vector(offset, offset);
-		var drawEnd = new Vector(canvas.width - offset, canvas.height - offset);
+		var drawStart = new Vector(this.offset, this.offset);
+		var drawEnd = new Vector(canvas.width - this.offset, canvas.height - this.offset);
 		var shape = new Shape(this.tool, drawStart, drawEnd, this.lineColour, this.lineWidth, this.fillColour);
 		shape.draw(context);
-		// console.log(context);
 	}
 };
