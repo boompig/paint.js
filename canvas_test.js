@@ -31,7 +31,6 @@ Tester.prototype.startPreview = function(drawStart) {
 	this.fillColour = toolbar.fillColour;
 	this.lineColour = toolbar.lineColour;
 	this.lineWidth = toolbar.lineWidth;
-	this.tool = toolbar.tool;
 };
 
 /**
@@ -40,7 +39,7 @@ Tester.prototype.startPreview = function(drawStart) {
  */
 Tester.prototype.previewShape = function (drawEnd) {
 	this.clear(this.previewCanvas);
-	var shape = new Shape(this.tool, this.drawStart, drawEnd, this.lineColour, this.lineWidth, this.fillColour);
+	var shape = new Shape(toolbar.tool, this.drawStart, drawEnd, this.lineColour, this.lineWidth, this.fillColour);
 	shape.draw(this.previewLayer);
 };
 
@@ -49,7 +48,7 @@ Tester.prototype.previewShape = function (drawEnd) {
  * @param {Vector} drawEnd The end point for the shape.
  */
 Tester.prototype.endPreviewShape = function (drawEnd) {
-	var shape = new Shape(this.tool, this.drawStart, drawEnd, this.lineColour, this.lineWidth, this.fillColour);
+	var shape = new Shape(toolbar.tool, this.drawStart, drawEnd, this.lineColour, this.lineWidth, this.fillColour);
 	
 	this.shapeStack.push(shape);
     shape.draw(this.baseLayer);
@@ -130,6 +129,7 @@ Tester.prototype.eraseSelectedShape = function () {
 	if (this.selectedShape) {
 		this.clear(this.previewCanvas);
 		this.selectedShape = false;
+		this.deselectShape();
 	} else {
 		alert("No shape selected");
 	}
@@ -163,6 +163,7 @@ Tester.prototype.selectShape = function (shape) {
 	toolbar.setPreview(this.selectedShape);
 	
 	$("#eraseShapeButton").removeAttr("disabled");
+	$("#copyShapeButton").removeAttr("disabled");
 };
 
 /**
@@ -178,6 +179,7 @@ Tester.prototype.deselectShape = function () {
 	
 	this.selectedShape = false;
 	$("#eraseShapeButton").attr("disabled", "disabled");
+	$("#copyShapeButton").attr("disabled", "disabled");
 	$("#applyColoursButton").attr("disabled", "disabled");
 };
 
@@ -209,12 +211,21 @@ $("#clearButton").click(function () {
     mouseStart = false;
 });
 
-$("#eraseShapeButton").click(function() {
-	t.eraseSelectedShape();
+$("#copyShapeButton").click(function() {
+	// copy the currently selected shape
+	// depends on the p
+	
+	if(t.selectedShape) {
+		//TODO!!!
+		console.log("copy");
+			
+	} else {
+		alert("Nothing selected");
+	}
 });
 
-$(".drawtoolButton").change(function() {
-	t.tool = this.value;
+$("#eraseShapeButton").click(function() {
+	t.eraseSelectedShape();
 });
 
 $("#applyColoursButton").click(function() {
@@ -235,7 +246,7 @@ $("#applyColoursButton").click(function() {
 /************************ Canvas mouse events *******************/
 
 $("#previewLayer").mousedown(function (e) {
-	if (t.tool == "select") {
+	if (toolbar.tool == "select") {
 		var coords = util.toCanvasCoords(e)
 		
 		t.trySelect(coords);
@@ -255,11 +266,11 @@ $("#previewLayer").mousemove(function (e) {
 	var coords = util.toCanvasCoords(e);
 	$("#canvasCoords").text(coords.toString());
 
-	if(t.tool == "select" && t.selectedShape && mouseStart) {
+	if(toolbar.tool == "select" && t.selectedShape && mouseStart) {
 		var mouseDelta = util.toCanvasCoords(e).sub(mouseStart);
 		t.moveSelectedShape(mouseDelta);
 		mouseStart = coords;
-	} else if (t.tool == "select") {
+	} else if (toolbar.tool == "select") {
 		// console.log(t.selectedShape);
 		// console.log(mouseStart);
 	}else if (drag) {
@@ -268,7 +279,7 @@ $("#previewLayer").mousemove(function (e) {
 });
 
 $("#previewLayer").mouseup(function (e) {
-	if (t.tool == "select" && t.selectedShape && mouseStart) {
+	if (toolbar.tool == "select" && t.selectedShape && mouseStart) {
 		// t.deselectShape();
 		mouseStart = false;
 	} else if (drag) {
