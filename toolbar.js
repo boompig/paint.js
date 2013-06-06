@@ -8,15 +8,28 @@
 function Toolbar() {
 	/** how much off the preview canvas border to draw the preview shape */
 	this.offset = 2;
+	this.changed = false;
 	
-	/** uninstantiated stuff */
+	/** uninstantiated stuff, it's fine if they are undefined for now */
 	this.tool;
 	this.fillColour;
 	this.lineColour;
 	this.lineWidth;	
+	/* the shape currently being worked on */
+	this.currentShape;
 	
 	/* make listeners */
 	var obj = this;
+	
+	$("#randomColourButton").click(function() {
+		var colour = util.randomColour().substring(1);
+		
+		if (obj.tool == "line" || (obj.currentShape && obj.currentShape.name == "line")) {
+			$("#lineColour").val(colour).change();
+		} else {
+			$("#fillColour").val(colour).change();
+		}
+	});
 	
 	$(".drawtoolButton").change(function() {
 		obj.setTool(this.value);
@@ -42,6 +55,14 @@ function Toolbar() {
  */
 Toolbar.prototype.setTool = function(toolText) {
 	this.tool = toolText;
+	
+	if (this.tool != "select") {
+		// hide when there is no select
+		$("#applyColoursButton").hide();
+		// shape being worked on has changed
+		this.currentShape = false;
+	}
+	
 	this.previewColour(); 
 };
 
@@ -53,15 +74,20 @@ Toolbar.prototype.setPreview = function(shape) {
 	var canvas = $("#colourPreview")[0];
 	var context = canvas.getContext("2d");
 	
-	var newShape = shape.copy();
-	console.log(newShape);
+	this.currentShape = shape.copy();
 	
 	var drawStart = new Vector(this.offset, this.offset);
 	var drawEnd = new Vector(canvas.width - this.offset, canvas.height - this.offset);
-	newShape.setSize(drawStart, drawEnd);
+	this.currentShape.setSize(drawStart, drawEnd);
 	
 	util.clearCanvas(canvas);
-	newShape.draw(context);
+	this.currentShape.draw(context);
+	
+	// show the applyColoursButton, but disable it
+	$("#applyColoursButton").show();
+	$("#applyColoursButton").attr("disabled", "disabled");
+	
+	this.changed = false;
 };
 
 /**
@@ -77,7 +103,7 @@ Toolbar.prototype.previewColour = function() {
 	var outline = "#" + $(".colourField.line").val();
 	var w = $("#outlineWidth").val();
 	
-	if (this.tool == "select") {
+	if (this.tool == "select" && ! this.currentShape) {
 		allGood = false;
 	}
 	
@@ -115,10 +141,24 @@ Toolbar.prototype.previewColour = function() {
 	util.clearCanvas(canvas);
 	
 	if (allGood) {
-		var context = canvas.getContext("2d");
-		var drawStart = new Vector(this.offset, this.offset);
-		var drawEnd = new Vector(canvas.width - this.offset, canvas.height - this.offset);
-		var shape = new Shape(this.tool, drawStart, drawEnd, this.lineColour, this.lineWidth, this.fillColour);
+		// there is a different 'good' configuration from what was there before
+		this.changed = true;
+		$("#applyColoursButton").removeAttr("disabled");
+		var context = canvas.getContext("2d"), shape;
+		
+		if (this.tool == "select" && this.currentShape) {
+			shape = this.currentShape;
+			shape.setColours(this.lineColour, this.lineWidth, this.fillColour);
+		} else {
+			var drawStart = new Vector(this.offset, this.offset);
+			var drawEnd = new Vector(canvas.width - this.offset, canvas.height - this.offset);
+			shape = new Shape(this.tool, drawStart, drawEnd, this.lineColour, this.lineWidth, this.fillColour);
+		}
+		
 		shape.draw(context);
+	} else {
+		// disable it if one of the settings is bad
+		console.log("bad settings");
+		$("#applyColoursButton").attr("disabled", "disabled");
 	}
 };

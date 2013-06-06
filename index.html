@@ -13,9 +13,6 @@
 		<script src="utils.js"></script>
 		<script src="shape.js"></script>
 		
-		<!-- wrapper for toolbar -->
-		<script src="toolbar.js"></script>
-		
 		<style>
 			#canvasContainer {
 				display: inline-block;
@@ -65,6 +62,8 @@
 			
 					<label>Preview</label>
 					<canvas id="colourPreview" height="30" width="30"><!-- will always be empty --></canvas>
+					
+					<button type="button" id="applyColoursButton" style="display: none;">Apply</button>
 				</fieldset>
 				<fieldset>
 					<legend>Options</legend>
@@ -81,7 +80,8 @@
 		</div>
 		<div id="canvasCoords"><!-- auto-gen --></div>
 		
-		<!-- <script src="kinetic_test.js" defer="defer"></script> -->
+		<!-- wrappers for GUI objects. Deferred because they add listeners -->
+		<script src="toolbar.js" defer="defer"></script>
 		<script src="canvas_test.js" defer="defer"></script>
 	</body>
 </html>

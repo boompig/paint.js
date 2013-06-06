@@ -11,23 +11,11 @@ var uid = 0;
  * @param {String} fillColour A hex for the fill colour
  */
 function Shape(name, drawStart, drawEnd, lineColour, lineWidth, fillColour) {
-	// we're going to order drawStart and drawEnd based on x-coordinates
-	// drawStart goes first, with lowest x-coordinate
-	if (drawStart.x > drawEnd.x) {
-		var t = drawEnd;
-		drawEnd = drawStart;
-		drawStart = t;
-	}
-	
 	this.name = name;
-	this.lineColour = lineColour;
-	this.lineWidth = lineWidth;
 	this.uid = uid++;
 	
-	if (fillColour)
-		this.fillColour = fillColour
-	
 	this.setSize(drawStart, drawEnd);
+	this.setColours(lineColour, lineWidth, fillColour);
 }
 
 /**
@@ -36,8 +24,13 @@ function Shape(name, drawStart, drawEnd, lineColour, lineWidth, fillColour) {
  * @param {Vector} drawEnd The new ending point for the shape
  */
 Shape.prototype.setSize = function(drawStart, drawEnd) {
-	this.drawStart = drawStart;
-	this.drawEnd = drawEnd;
+	// we're going to order drawStart and drawEnd based on x-coordinates
+	// drawStart goes first, with lowest x-coordinate
+	if (drawStart.x > drawEnd.x) {
+		var t = drawEnd, drawEnd = drawStart, drawStart = t;
+	}
+	
+	this.drawStart = drawStart, this.drawEnd = drawEnd;
 	
 	switch (this.name) {
 		case "rect":
@@ -55,6 +48,16 @@ Shape.prototype.setSize = function(drawStart, drawEnd) {
 			// do nothing
 			break;
 	}
+};
+
+/**
+ * Set the colours and line width of this shape.
+ * @param {String} lineColour A hex for the line colour
+ * @param {number} lineWidth An int for the line width
+ * @param {String} fillColour A hex for the fill colour
+ */
+Shape.prototype.setColours = function(lineColour, lineWidth, fillColour) {
+	this.lineColour = lineColour, this.lineWidth = lineWidth, this.fillColour = fillColour;
 };
 
 /**
@@ -95,6 +98,7 @@ Shape.prototype.intersects = function(p) {
 /**
  * Prepare the given context to start drawing.
  * Called internally only.
+ * @param {Object} context
  */
 Shape.prototype.prepareDraw = function(context) {
 	context.save();
@@ -107,6 +111,7 @@ Shape.prototype.prepareDraw = function(context) {
 /**
  * Finish the drawing.
  * Called internally only.
+ * @param {Object} context
  */
 Shape.prototype.endDraw = function(context) {
 	context.stroke();
@@ -115,6 +120,7 @@ Shape.prototype.endDraw = function(context) {
 
 /**
  * Draw the current shape on the given context.
+ * @param {Object} context
  */
 Shape.prototype.draw = function(context) {
 	switch(this.name) {
@@ -160,6 +166,10 @@ Shape.prototype.drawCircle = function(context) {
 	this.endDraw(context);
 };
 
+/**
+ * Draw a rectangle on the given context.
+ * @param {Object} context
+ */
 Shape.prototype.drawRect = function(context) {
 	this.prepareDraw(context);
 	

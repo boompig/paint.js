@@ -93,6 +93,7 @@ Tester.prototype.trySelect = function (selectPos) {
  * Redraw all the objects on the main canvas.
  */
 Tester.prototype.redraw = function () {
+	// use function call to not destroy resident shapes
 	util.clearCanvas(this.baseCanvas);
 	
     for (var i = 0; i < this.shapeStack.length; i++) {
@@ -102,14 +103,21 @@ Tester.prototype.redraw = function () {
 
 /**
  * Clear the given canvas. Return true.
- * @param canvas The canvas.
+ * @param {Object} canvas The canvas.
  */
 Tester.prototype.clear = function (canvas) {
+	// deselect before clear
+	if (canvas == this.baseCanvas) 
+		this.deselectShape();
+	
     util.clearCanvas(canvas);
     
     if(canvas === this.baseCanvas) {
     	this.shapeStack = new Array();
-    	this.deselectShape();
+    	
+    	// update the toolbar
+    	toolbar.currentShape = false;
+    	toolbar.previewColour()
     }
     
     return true;
@@ -170,6 +178,7 @@ Tester.prototype.deselectShape = function () {
 	
 	this.selectedShape = false;
 	$("#eraseShapeButton").attr("disabled", "disabled");
+	$("#applyColoursButton").attr("disabled", "disabled");
 };
 
 /**
@@ -189,7 +198,10 @@ Tester.prototype.moveSelectedShape = function (delta) {
 
 var t = new Tester();
 
-// listeners
+/* listeners */
+
+/********************* Toolbar button events ********************/
+
 $("#clearButton").click(function () {
     t.clear(t.baseCanvas);
     t.clear(t.previewCanvas);
@@ -201,14 +213,24 @@ $("#eraseShapeButton").click(function() {
 	t.eraseSelectedShape();
 });
 
-$("#randomColourButton").click(function() {
-	$("#fillColour").val(util.randomColour().substring(1));
-	$("#fillColour").change();
-});
-
 $(".drawtoolButton").change(function() {
 	t.tool = this.value;
 });
+
+$("#applyColoursButton").click(function() {
+	if (toolbar.changed && t.selectedShape) {
+		// change properties of the selected shape
+		t.selectedShape.setColours(toolbar.lineColour, toolbar.lineWidth, toolbar.fillColour);
+		
+		// redraw
+		t.clear(t.previewLayer);
+		t.selectedShape.draw(t.previewLayer);
+	} else {
+		alert("Error - nothing selected");
+	}
+});
+
+/********************* End toolbar button events ********************/
 
 /************************ Canvas mouse events *******************/
 
@@ -220,7 +242,8 @@ $("#previewLayer").mousedown(function (e) {
 		if (t.selectedShape) {
 			mouseStart = coords;
 		} else {
-			// console.log("none selected");
+			toolbar.currentShape = false;
+			toolbar.previewColour();
 		}
 	} else {
 		t.deselectShape();
