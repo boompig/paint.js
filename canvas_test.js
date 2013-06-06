@@ -16,8 +16,20 @@ function Tester() {
 	this.shapeStack = new Array();
 	
 	/** Instantiate a bunch of vars (it's fine if they are undefined for now) */
+	
+	/**
+	 * @returns {Vector}
+	 */
 	this.drawStart;
+	
+	/**
+	 * @returns {String}
+	 */
 	this.fillColour;
+	
+	/**
+	 * @returns {Shape}
+	 */
 	this.selectedShape;
 }
 
@@ -198,6 +210,15 @@ Tester.prototype.moveSelectedShape = function (delta) {
 	this.selectedShape.draw(this.previewLayer);
 };
 
+/**
+ * Copy the currently selected shape back onto the canvas.
+ */
+Tester.prototype.copySelectedShape = function () {
+	var canvasCenter = new Vector(this.baseCanvas.width / 2, this.baseCanvas.height / 2);
+	var shape = this.selectedShape;
+	var shapeCenter = shape.getCenter();
+};
+
 var t = new Tester();
 
 /* listeners */
@@ -216,9 +237,7 @@ $("#copyShapeButton").click(function() {
 	// depends on the p
 	
 	if(t.selectedShape) {
-		//TODO!!!
-		console.log("copy");
-			
+		t.copySelectedShape();
 	} else {
 		alert("Nothing selected");
 	}

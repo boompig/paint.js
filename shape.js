@@ -38,11 +38,9 @@ Shape.prototype.setSize = function(drawStart, drawEnd) {
 			this.h = drawEnd.y - drawStart.y;
 			break;
 		case "circle":
-			// the center will be the middle between drawStart and drawEnd
-			this.center = new Vector((drawEnd.x + drawStart.x) / 2, (drawEnd.y + drawStart.y) / 2);
-			
 			// the radius will be the maximum of horizontal and vertical radius
-			this.radius = Math.max(Math.abs(this.center.x - drawEnd.x), Math.abs(this.center.y - drawEnd.y));
+			var radiusVector = this.getCenter().sub(drawEnd);
+			this.radius = Math.max(Math.abs(radiusVector.x), Math.abs(radiusVector.y));
 			break;
 		default:
 			// do nothing
@@ -68,10 +66,6 @@ Shape.prototype.setColours = function(lineColour, lineWidth, fillColour) {
 Shape.prototype.move = function(moveVector) {
 	this.drawStart = this.drawStart.add(moveVector);
 	this.drawEnd = this.drawEnd.add(moveVector);
-	
-	if (this.name == "circle") {
-		this.center = this.center.add(moveVector);
-	}
 };
 
 /**
@@ -84,7 +78,7 @@ Shape.prototype.intersects = function(p) {
 	
 	switch (this.name) {
 		case "circle":
-			var rSquared = p.sub(this.center).sizeSquared();
+			var rSquared = p.sub(this.getCenter()).sizeSquared();
 			return rSquared <= Math.pow(this.radius, 2);
 		case "rect":
 			return ((a.x < p.x) && (p.x < b.x)) && (((a.y < p.y) && (p.y < b.y)) || ((b.y < p.y) && (p.y < a.y)));
@@ -158,8 +152,9 @@ Shape.prototype.drawLine = function(context) {
 Shape.prototype.drawCircle = function(context) {
 	this.prepareDraw(context);
 	
+	var center = this.getCenter();
 	context.beginPath();
-	context.arc(this.center.x, this.center.y, this.radius, 2 * Math.PI, false);
+	context.arc(center.x, center.y, this.radius, 2 * Math.PI, false);
 	context.closePath();
 	context.fill();
 	
@@ -183,7 +178,16 @@ Shape.prototype.drawRect = function(context) {
 
 /**
  * Return a copy of this shape.
+ * @returns Shape
  */
 Shape.prototype.copy = function() {
 	return new Shape(this.name, this.drawStart, this.drawEnd, this.lineColour, this.lineWidth, this.fillColour);
+};
+
+/**
+ * Return the center of this shape.
+ * @returns Vector
+ */
+Shape.prototype.getCenter = function() {
+	return this.drawStart.add(this.drawEnd).mul(.5);
 };
