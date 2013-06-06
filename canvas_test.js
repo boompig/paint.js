@@ -67,9 +67,6 @@ Tester.prototype.endPreviewShape = function (drawEnd) {
     
     this.clear(this.previewCanvas);
     drag = false;
-    
-    // select the newly-added shape
-    this.selectShape(shape);
 };
 
 /**
@@ -264,6 +261,11 @@ var t = new Tester();
 
 /********************* Toolbar button events ********************/
 
+$(".drawtoolButton").change(function() {
+	if (this.value != "select")
+		t.deselectShape();
+});
+
 $("#clearButton").click(function () {
     t.clear(t.baseCanvas);
     t.clear(t.previewCanvas);
@@ -292,24 +294,36 @@ $("#applyColoursButton").click(function() {
 /************************ Canvas mouse events *******************/
 
 $("#previewLayer").mousedown(function (e) {
+	var coords = util.toCanvasCoords(e);
+	
 	if (toolbar.tool == "select") {
-		var coords = util.toCanvasCoords(e)
-		
 		t.trySelect(coords);
 		if (t.selectedShape) {
 			mouseStart = coords;
+			$("#previewLayer").css("cursor", "move");
 		} else {
 			t.deselectShape();
 		}
 	} else {
 		t.deselectShape();
-		t.startPreview(util.toCanvasCoords(e));	
+		t.startPreview(coords);	
 	}
 });
 
 $("#previewLayer").mousemove(function (e) {
 	var coords = util.toCanvasCoords(e);
 	$("#canvasCoords").text(coords.toString());
+	
+	if (t.selectedShape && t.selectedShape.intersects(coords)) {
+		if (! mouseStart) {
+			$("#previewLayer").css("cursor", "pointer");
+		} else {
+			// leave the cursor as it is (should be move)
+			$("#previewLayer").css("cursor", "move");
+		}	
+	} else {
+		$("#previewLayer").css("cursor", "auto");
+	}
 
 	if(toolbar.tool == "select" && t.selectedShape && mouseStart) {
 		var mouseDelta = util.toCanvasCoords(e).sub(mouseStart);
@@ -318,15 +332,15 @@ $("#previewLayer").mousemove(function (e) {
 	} else if (toolbar.tool == "select") {
 		// console.log(t.selectedShape);
 		// console.log(mouseStart);
-	}else if (drag) {
+	} else if (drag) {
         t.previewShape(coords);
     }
 });
 
 $("#previewLayer").mouseup(function (e) {
 	if (toolbar.tool == "select" && t.selectedShape && mouseStart) {
-		// t.deselectShape();
 		mouseStart = false;
+		$("#previewLayer").css("cursor", "pointer");
 	} else if (drag) {
    		t.endPreviewShape(util.toCanvasCoords(e));
 	}
