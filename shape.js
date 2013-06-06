@@ -16,6 +16,8 @@ function Shape(name, drawStart, drawEnd, lineColour, lineWidth, fillColour) {
 	
 	this.setSize(drawStart, drawEnd);
 	this.setColours(lineColour, lineWidth, fillColour);
+	
+	this.selected = false;
 }
 
 /**
@@ -42,7 +44,7 @@ Shape.prototype.setSize = function(drawStart, drawEnd) {
 			var radiusVector = this.getCenter().sub(drawEnd);
 			this.radius = Math.max(Math.abs(radiusVector.x), Math.abs(radiusVector.y));
 			break;
-		default:
+		default: // line
 			// do nothing
 			break;
 	}
@@ -131,6 +133,51 @@ Shape.prototype.draw = function(context) {
 };
 
 /**
+ * Draw a selection circle around the given center.
+ * Meant to be used internally.
+ * @param {Object} context
+ * @param {Vector} center The centre of the circle.
+ */
+Shape.prototype.drawSelectionCircle = function(context, center) {
+	var r = 7; //radius
+	var c = "#1B94E0"; // line colour
+	
+	context.save();
+	
+	context.lineWidth = 1;
+	context.strokeStyle = c;
+	
+	context.beginPath();
+	context.arc(center.x, center.y, r, 2 * Math.PI, false);
+	context.closePath();
+	context.stroke();
+	
+	context.restore();
+};
+
+/**
+ * Draw a selection square around the given center.
+ * @param {Object} context
+ * @param {Vector} center The centre of the square.
+ * @param {number} radius Half the side length of the square
+ */
+Shape.prototype.drawSelectionSquare = function(context, center, radius) {
+	var c = "#1B94E0"; // line colour
+	
+	context.save();
+	
+	context.lineWidth = 1;
+	context.strokeStyle = c;
+	
+	context.beginPath();
+	context.rect(center.x - radius, center.y - radius, 2 * radius, 2 * radius);
+	context.closePath();
+	context.stroke();
+	
+	context.restore();
+};
+
+/**
  * Draw a line on the given context.
  * @param {Object} context
  */
@@ -143,6 +190,11 @@ Shape.prototype.drawLine = function(context) {
 	context.closePath();
 	
 	this.endDraw(context);
+	
+	if (this.selected) {
+		this.drawSelectionCircle(context, this.drawStart);
+		this.drawSelectionCircle(context, this.drawEnd);
+	}
 };
 
 /**
@@ -159,6 +211,14 @@ Shape.prototype.drawCircle = function(context) {
 	context.fill();
 	
 	this.endDraw(context);
+	
+	if (this.selected) {
+		this.drawSelectionSquare(context, center, this.radius);
+		
+		
+		
+		// this.drawSelectionCircle()
+	}
 };
 
 /**
@@ -174,6 +234,15 @@ Shape.prototype.drawRect = function(context) {
 	context.fill();
 	
 	this.endDraw(context);
+	
+	if (this.selected) {
+		this.drawSelectionCircle(context, this.drawStart);
+		this.drawSelectionCircle(context, this.drawEnd);
+		
+		// and the 2 other points
+		this.drawSelectionCircle(context, new Vector(this.drawStart.x + this.w, this.drawStart.y));
+		this.drawSelectionCircle(context, new Vector(this.drawStart.x, this.drawStart.y + this.h));
+	}
 };
 
 /**

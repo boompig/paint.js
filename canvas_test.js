@@ -150,6 +150,7 @@ Tester.prototype.eraseSelectedShape = function () {
  */
 Tester.prototype.selectShape = function (shape) {
 	this.selectedShape = shape;
+	shape.selected = true;
 	
 	// remove from the main canvas
 	var i = this.shapeStack.length - 1;
@@ -180,6 +181,8 @@ Tester.prototype.selectShape = function (shape) {
  */
 Tester.prototype.deselectShape = function () {
 	if (this.selectedShape) {
+		this.selectedShape.selected = false;
+		
 		// add the selected shape back to the main canvas
 		this.selectedShape.draw(this.baseLayer);
 	    this.shapeStack.push(this.selectedShape);
