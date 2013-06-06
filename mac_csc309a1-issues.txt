@@ -1,0 +1,27 @@
+Explore these functions in canvas context:
+	- scale
+	- rotate
+	- setTransform
+	- clip
+	- clearRect
+	- transform
+	- translate
+	
+Differences between Chrome and FF (Mac):
+	- FF:
+		- colour preview canvas doesn't update even though change event registers and shape is redrawn
+			- HOWEVER: 
+				- updates on ALT+TAB
+				- works when debug point set in firebug
+				- works on Chrome
+		
+		-  preview layer doesn't add a shape when moving mouse around (though only tried w/ trackpad)
+			- HOWEVER:
+				- works on Chrome (kind of)
+				
+	- Chrome
+		- rectangles don't fill on main canvas
+			- HOWEVER:
+				- works on FF
+				- works on colour preview canvas (and the same code is used in both places)
+				- doesn't occur for circles

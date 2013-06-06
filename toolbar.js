@@ -92,11 +92,13 @@ Toolbar.prototype.previewColour = function() {
 	util.clearCanvas(canvas);
 	
 	if (allGood) {
+		// console.log("redraw");
 		var context = canvas.getContext("2d");
 		var offset = 2;
 		var drawStart = new Vector(offset, offset);
 		var drawEnd = new Vector(canvas.width - offset, canvas.height - offset);
 		var shape = new Shape(this.tool, drawStart, drawEnd, this.lineColour, this.lineWidth, this.fillColour);
 		shape.draw(context);
+		// console.log(context);
 	}
 };
