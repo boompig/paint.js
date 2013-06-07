@@ -1,4 +1,3 @@
-var drag = false;
 var util = new Utils(); // for quick reference to utils
 var toolbar = new Toolbar();
 var mouseStart = false; // for check of whether this is click or drag
@@ -18,19 +17,14 @@ function Tester() {
 	/** Instantiate a bunch of vars (it's fine if they are undefined for now) */
 	
 	/**
-	 * @returns {Vector}
+	 * @returns {Shape}
 	 */
-	this.drawStart;
-	
-	/**
-	 * @returns {String}
-	 */
-	this.fillColour;
+	this.selectedShape;
 	
 	/**
 	 * @returns {Shape}
 	 */
-	this.selectedShape;
+	this.currentShape;
 }
 
 /**
@@ -38,11 +32,7 @@ function Tester() {
  * @param {Vector} drawStart The starting point for the shape.
  */
 Tester.prototype.startPreview = function(drawStart) {
-	this.drawStart = drawStart;
-	drag = true;
-	this.fillColour = toolbar.fillColour;
-	this.lineColour = toolbar.lineColour;
-	this.lineWidth = toolbar.lineWidth;
+	this.currentShape = new Shape(toolbar.tool, drawStart, drawStart, toolbar.lineColour, toolbar.lineWidth, toolbar.fillColour);
 };
 
 /**
@@ -51,8 +41,8 @@ Tester.prototype.startPreview = function(drawStart) {
  */
 Tester.prototype.previewShape = function (drawEnd) {
 	this.clear(this.previewCanvas);
-	var shape = new Shape(toolbar.tool, this.drawStart, drawEnd, this.lineColour, this.lineWidth, this.fillColour);
-	shape.draw(this.previewLayer);
+	this.currentShape.resize(drawEnd);
+	this.currentShape.draw(this.previewLayer);
 };
 
 /**
@@ -60,13 +50,12 @@ Tester.prototype.previewShape = function (drawEnd) {
  * @param {Vector} drawEnd The end point for the shape.
  */
 Tester.prototype.endPreviewShape = function (drawEnd) {
-	var shape = new Shape(toolbar.tool, this.drawStart, drawEnd, this.lineColour, this.lineWidth, this.fillColour);
+	this.currentShape.resize(drawEnd);
 	
-	this.shapeStack.push(shape);
-    shape.draw(this.baseLayer);
-    
+	this.shapeStack.push(this.currentShape);
+    this.currentShape.draw(this.baseLayer);
     this.clear(this.previewCanvas);
-    drag = false;
+	this.currentShape = false; // destroy this pointer to the shape
 };
 
 /**
@@ -152,7 +141,7 @@ Tester.prototype.selectShape = function (shape) {
 	this.selectedShape = shape;
 	shape.selected = true;
 	
-	// remove from the main canvas
+	// remove from the main canvas (will work even if not on main canvas)
 	var i = this.shapeStack.length - 1;
 	while (i >= 0) {
 		if (this.shapeStack[i].uid === this.selectedShape.uid) {
@@ -168,6 +157,12 @@ Tester.prototype.selectShape = function (shape) {
 	
 	// add to the preview canvas
 	this.selectedShape.draw(this.previewLayer);
+	
+	// add resize circles to preview canvas
+	var circles = this.selectedShape.getResizeCircles();
+	for (var j = 0; j < circles.length; j++) {
+		circles[j].draw(this.previewLayer);
+	}
 	
 	// preview the shape on the toolbar preview canvas
 	toolbar.setPreview(this.selectedShape);
@@ -333,9 +328,7 @@ $("#previewLayer").mousemove(function (e) {
 		t.moveSelectedShape(mouseDelta);
 		mouseStart = coords;
 	} else if (toolbar.tool == "select") {
-		// console.log(t.selectedShape);
-		// console.log(mouseStart);
-	} else if (drag) {
+	} else if (t.currentShape) {
         t.previewShape(coords);
     }
 });
@@ -344,7 +337,7 @@ $("#previewLayer").mouseup(function (e) {
 	if (toolbar.tool == "select" && t.selectedShape && mouseStart) {
 		mouseStart = false;
 		$("#previewLayer").css("cursor", "pointer");
-	} else if (drag) {
+	} else if (t.currentShape) {
    		t.endPreviewShape(util.toCanvasCoords(e));
 	}
 });

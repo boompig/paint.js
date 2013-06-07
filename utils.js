@@ -31,8 +31,8 @@ Utils.prototype.toCanvasCoords = function(evt) {
 
 /**
  * Return a random integer in the range [a, b). If b not specified, range is [0, a).
- * @param {number} a (optional) Hard lower limit
- * @param {number} b Soft upper limit
+ * @param {Number} a (optional) Hard lower limit
+ * @param {Number} b Soft upper limit
  */
 Utils.prototype.randInt = function(a, b) {
 	if (b === undefined) {

@@ -1,7 +1,7 @@
 /**
  * Create a new vector (or point) object in 2D space.
- * @param {number} x The x-coordinate
- * @param {number} y The y-coordinate
+ * @param {Number} x The x-coordinate
+ * @param {Number} y The y-coordinate
  */
 function Vector(x, y) {
 	this.x = x;
@@ -10,7 +10,7 @@ function Vector(x, y) {
 
 /**
  * Return the squared magnitude of this vector.
- * @returns {number}
+ * @returns {Number}
  */
 Vector.prototype.sizeSquared = function() {
 	return Math.pow(this.x, 2) + Math.pow(this.y, 2);
@@ -18,7 +18,7 @@ Vector.prototype.sizeSquared = function() {
 
 /**
  * Return the magnitude of this vector.
- * @returns {number}
+ * @returns {Number}
  */
 Vector.prototype.size = function() {
 	return Math.sqrt(this.sizeSquared());
@@ -27,7 +27,7 @@ Vector.prototype.size = function() {
 /**
  * Return the dot-product of this vector and v2.
  * @param {Vector} v2 The other vector.
- * @returns {number}
+ * @returns {Number}
  */
 Vector.prototype.dotProduct = function(v2) {
 	return (v2.x * this.x) + (v2.y * this.y);
@@ -36,7 +36,7 @@ Vector.prototype.dotProduct = function(v2) {
 /**
  * Return scalar projection of this vector onto v2.
  * @param {Vector} v2 The other vector.
- * @returns {number}
+ * @returns {Number}
  */
 Vector.prototype.projectScalar = function(v2) {
 	// `this <dot> v2` / || v2 ||
@@ -63,7 +63,7 @@ Vector.prototype.add = function(v2) {
 
 /**
  * Scalar multiply this vector by c
- * @param {number} c The scalar.
+ * @param {Number} c The scalar.
  * @returns {Vector}
  */
 Vector.prototype.mul = function(c) {
@@ -92,6 +92,15 @@ Vector.prototype.isZero = function () {
  */
 Vector.prototype.copy = function () {
 	return new Vector(this.x, this.y);
+};
+
+/**
+ * Return true iff this vector is the same as v2
+ * @param {Vector} v2 Another vector.
+ * @returns {bool}
+ */
+Vector.prototype.equals = function(v2) {
+	return this.x == v2.x && this.y == v2.y;
 };
 
 /**
