@@ -1,6 +1,3 @@
-/** Used to assign unique IDs to shapes. */
-var uid = 0;
-
 /**
  * Create a new shape with all the given parameters.
  * @param {String} name The shape name - one of "line", "rect", "circle"
@@ -12,13 +9,20 @@ var uid = 0;
  */
 function Shape(name, drawStart, drawEnd, lineColour, lineWidth, fillColour) {
 	this.name = name;
-	this.uid = uid++;
+	this.uid = Shape.uid++;
 	
 	this.setSize(drawStart, drawEnd);
 	this.setColours(lineColour, lineWidth, fillColour);
 	
 	this.selected = false;
+	this.resizePoints = new Array();
 }
+
+/** 
+ * Used to assign unique IDs to shapes. 
+ * @returns {number}
+ */
+Shape.uid = 0
 
 /**
  * Set the size of the shape by changing the endpoints.
@@ -68,6 +72,27 @@ Shape.prototype.setColours = function(lineColour, lineWidth, fillColour) {
 Shape.prototype.move = function(moveVector) {
 	this.drawStart = this.drawStart.add(moveVector);
 	this.drawEnd = this.drawEnd.add(moveVector);
+	
+	if (this.selected) {
+		// recreate the resizePoints
+	}
+};
+
+/**
+ * Create the resize points for this shape.
+ * Recreate the array, so don't even try to keep another pointer to it
+ * Use only internally
+ */
+Shape.prototype._makeResizePoints = function() {
+	
+	switch (this.name) {
+		case "line":
+			this.resizePoints = [drawStart, drawEnd];
+			break;
+		case "circle":
+			// figure out what the bounding square looks like
+			break;
+	}
 };
 
 /**
@@ -92,11 +117,21 @@ Shape.prototype.intersects = function(p) {
 };
 
 /**
+ * Return true iff the given point p intersects the resize points
+ * @param {Vector} p
+ */
+Shape.prototype.intersectsResizePoints = function(p) {
+	// check what I am intersecting with
+	//TODO for now
+	return false;
+};
+
+/**
  * Prepare the given context to start drawing.
  * Called internally only.
  * @param {Object} context
  */
-Shape.prototype.prepareDraw = function(context) {
+Shape.prototype._prepareDraw = function(context) {
 	context.save();
 	if (this.fillColour)
 		context.fillStyle = this.fillColour;
@@ -109,7 +144,7 @@ Shape.prototype.prepareDraw = function(context) {
  * Called internally only.
  * @param {Object} context
  */
-Shape.prototype.endDraw = function(context) {
+Shape.prototype._endDraw = function(context) {
 	context.stroke();
 	context.restore();
 };
@@ -169,12 +204,31 @@ Shape.prototype.drawSelectionSquare = function(context, center, radius) {
 	context.lineWidth = 1;
 	context.strokeStyle = c;
 	
+	var rVector = new Vector(radius, radius);
+	var a = center.sub(rVector), b = center.add(rVector);
+
+	// create selection points for circle / rect
+	this.selectionPoints = new Array();
+	this.selectionPoints.push(a);
+	this.selectionPoints.push(new Vector(a.x, b.y));
+	this.selectionPoints.push(b);
+	this.selectionPoints.push(new Vector(b.x, a.y));
+	
+	// var v = this.drawEnd.sub(this.drawStart);
+	
+	// create the square / rectangle
 	context.beginPath();
-	context.rect(center.x - radius, center.y - radius, 2 * radius, 2 * radius);
+	// context.rect(this.drawStart.x, this.drawStart.y, v.x, v.y);
+	context.rect(center.x - radius, center.y - radius, radius  * 2, radius * 2);
 	context.closePath();
 	context.stroke();
 	
 	context.restore();
+	
+	// create a circle at each corner
+	for (var i = 0; i < this.selectionPoints.length; i++) { 
+		this.drawSelectionCircle(context, this.selectionPoints[i]);
+	}
 };
 
 /**
@@ -182,14 +236,14 @@ Shape.prototype.drawSelectionSquare = function(context, center, radius) {
  * @param {Object} context
  */
 Shape.prototype.drawLine = function(context) {
-	this.prepareDraw(context);
+	this._prepareDraw(context);
 	
 	context.beginPath();
 	context.moveTo(this.drawStart.x, this.drawStart.y);
 	context.lineTo(this.drawEnd.x, this.drawEnd.y);
 	context.closePath();
 	
-	this.endDraw(context);
+	this._endDraw(context);
 	
 	if (this.selected) {
 		this.drawSelectionCircle(context, this.drawStart);
@@ -202,7 +256,7 @@ Shape.prototype.drawLine = function(context) {
  * @param {Object} context
  */
 Shape.prototype.drawCircle = function(context) {
-	this.prepareDraw(context);
+	this._prepareDraw(context);
 	
 	var center = this.getCenter();
 	context.beginPath();
@@ -210,7 +264,7 @@ Shape.prototype.drawCircle = function(context) {
 	context.closePath();
 	context.fill();
 	
-	this.endDraw(context);
+	this._endDraw(context);
 	
 	if (this.selected) {
 		this.drawSelectionSquare(context, center, this.radius);
@@ -226,14 +280,14 @@ Shape.prototype.drawCircle = function(context) {
  * @param {Object} context
  */
 Shape.prototype.drawRect = function(context) {
-	this.prepareDraw(context);
+	this._prepareDraw(context);
 	
 	context.beginPath();
 	context.rect(this.drawStart.x, this.drawStart.y, this.w, this.h);
 	context.closePath();
 	context.fill();
 	
-	this.endDraw(context);
+	this._endDraw(context);
 	
 	if (this.selected) {
 		this.drawSelectionCircle(context, this.drawStart);
