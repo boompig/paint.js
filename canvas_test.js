@@ -1,6 +1,5 @@
 var util = new Utils(); // for quick reference to utils
 var toolbar = new Toolbar();
-var mouseStart = false; // for check of whether this is click or drag
 
 /**
  * The main wrapper class for this application.
@@ -13,8 +12,19 @@ function Tester() {
 	this.baseLayer = this.baseCanvas.getContext("2d");
 	
 	this.shapeStack = new Array();
+	this.previewShapeStack = new Array();
 	
 	/** Instantiate a bunch of vars (it's fine if they are undefined for now) */
+	
+	/**
+	 * @returns {Vector}
+	 */
+	this.mouseStart;
+	
+	/**
+	 * @returns {Number}
+	 */
+	this.mode;
 	
 	/**
 	 * @returns {Shape}
@@ -28,11 +38,20 @@ function Tester() {
 }
 
 /**
+ * Different possible actions depending on where mouse was clicked
+ */
+Tester.moveMode = {
+	RESIZE : 1,
+	MOVE : 2
+};
+
+/**
  * Called at the start of the preview. Usually mousedown or click on canvas.
  * @param {Vector} drawStart The starting point for the shape.
  */
 Tester.prototype.startPreview = function(drawStart) {
 	this.currentShape = new Shape(toolbar.tool, drawStart, drawStart, toolbar.lineColour, toolbar.lineWidth, toolbar.fillColour);
+	// this._updatePreviewShapeStack();
 };
 
 /**
@@ -42,6 +61,7 @@ Tester.prototype.startPreview = function(drawStart) {
 Tester.prototype.previewShape = function (drawEnd) {
 	this.clear(this.previewCanvas);
 	this.currentShape.resize(drawEnd);
+	
 	this.currentShape.draw(this.previewLayer);
 };
 
@@ -50,12 +70,14 @@ Tester.prototype.previewShape = function (drawEnd) {
  * @param {Vector} drawEnd The end point for the shape.
  */
 Tester.prototype.endPreviewShape = function (drawEnd) {
-	this.currentShape.resize(drawEnd);
+	if (drawEnd)
+		this.currentShape.resize(drawEnd);
 	
 	this.shapeStack.push(this.currentShape);
     this.currentShape.draw(this.baseLayer);
     this.clear(this.previewCanvas);
 	this.currentShape = false; // destroy this pointer to the shape
+	this.previewShapeStack = new Array();
 };
 
 /**
@@ -64,6 +86,17 @@ Tester.prototype.endPreviewShape = function (drawEnd) {
  * @param {Vector} selectPos Where selection is being applied.
  */
 Tester.prototype.trySelect = function (selectPos) {
+	// first check for an intersection on the preview stack
+	for(var j = 0; j < this.previewShapeStack.length; j++) {
+		if (this.previewShapeStack[j].intersects(selectPos)) {
+			console.log("resize detected");
+			// console.log(this.previewShapeStack[j]);
+			this.selectedShape.setDragPt(this.previewShapeStack[j].getCenter());
+			this.mode = Tester.moveMode.RESIZE;
+			return;
+		}
+	}
+	
 	// deselect the current shape before picking up a new one
 	this.deselectShape();
 	
@@ -79,6 +112,7 @@ Tester.prototype.trySelect = function (selectPos) {
 			
 			this.selectShape(shape);
 			this.redraw();
+			this.mode = Tester.moveMode.MOVE;
 			return;
 		}
 		
@@ -99,8 +133,9 @@ Tester.prototype.redraw = function () {
 };
 
 /**
- * Clear the given canvas. Return true.
+ * Clear the given canvas. Remove all objects from that canvas. Return true.
  * @param {Object} canvas The canvas.
+ * @returns {boolean} True.
  */
 Tester.prototype.clear = function (canvas) {
 	// deselect before clear
@@ -115,9 +150,11 @@ Tester.prototype.clear = function (canvas) {
     	// update the toolbar
     	toolbar.currentShape = false;
     	toolbar.previewColour()
+    } else {
+    	this.previewShapeStack = new Array();
     }
     
-    return true;
+    return true; // done for debugging purposes
 };
 
 /**
@@ -155,20 +192,43 @@ Tester.prototype.selectShape = function (shape) {
 	// redraw the main canvas
 	this.redraw();
 	
+	// clear the preview canvas
+	this.clear(this.previewCanvas);
+	
 	// add to the preview canvas
 	this.selectedShape.draw(this.previewLayer);
 	
 	// add resize circles to preview canvas
-	var circles = this.selectedShape.getResizeCircles();
-	for (var j = 0; j < circles.length; j++) {
-		circles[j].draw(this.previewLayer);
-	}
+	this._updatePreviewShapeStack();
+	this._drawPreviewShapeStack();
 	
 	// preview the shape on the toolbar preview canvas
 	toolbar.setPreview(this.selectedShape);
 	
 	$("#eraseShapeButton").removeAttr("disabled");
 	$("#copyShapeButton").removeAttr("disabled");
+};
+
+/**
+ * Redraw the preview shape stack.
+ */
+Tester.prototype._drawPreviewShapeStack = function () {
+	for (var i = 0; i < this.previewShapeStack.length; i++) {
+		this.previewShapeStack[i].draw(this.previewLayer);
+	}
+};
+
+/**
+ * Update this.previewShapeStack based on this.selectedShape
+ * Throw out the old items in this.previewShapeStack
+ */
+Tester.prototype._updatePreviewShapeStack = function () {
+	this.previewShapeStack = new Array();
+	
+	var circles = this.selectedShape.getResizeCircles();
+	for (var j = 0; j < circles.length; j++) {
+		this.previewShapeStack.push(circles[j]);
+	}
 };
 
 /**
@@ -185,6 +245,7 @@ Tester.prototype.deselectShape = function () {
 	}
 	
 	this.selectedShape = false;
+	this.mode = false;
 	
 	// update the toolbar
 	toolbar.currentShape = false;
@@ -196,18 +257,61 @@ Tester.prototype.deselectShape = function () {
 };
 
 /**
- * Move the currently selected shape by the mouse delta
- * @param {Vector} delta The vector by which to move.
+ * Start the action of moving the selected shape.
+ * @param {Vector} mouseStart The starting position of the mouse.
  */
-Tester.prototype.moveSelectedShape = function (delta) {
+Tester.prototype.startMoveSelectedShape = function (mouseStart) {
 	if (! this.selectedShape) {
 		alert("No shape selected")
 		return;
 	}
 	
-	this.clear(this.previewCanvas);
-	this.selectedShape.move(delta);
+	this.mouseStart = mouseStart;
+	$("#previewLayer").css("cursor", "move");
+};
+
+/**
+ * End the action of moving the selected shape (or resize).
+ * @param {Vector} mouseEnd The final position of the mouse.
+ */
+Tester.prototype.endMoveSelectedShape = function (mouseEnd) {
+	this.mouseStart = false;
+	this.mode = false;
+	$("#previewLayer").css("cursor", "pointer");
+};
+
+
+
+/**
+ * Move the currently selected shape by the mouse delta
+ * @param {Vector} mouseEnd The current position of the mouse.
+ */
+Tester.prototype.moveSelectedShape = function (mouseEnd) {
+	if (! this.selectedShape) {
+		alert("No shape selected")
+		return;
+	}
+	
+	var delta = mouseEnd.sub(this.mouseStart);
+	this.mouseStart = mouseEnd;
+	
+	util.clearCanvas(this.previewCanvas); // don't want to remove all objects, just clear it
+	
+	if (this.mode == Tester.moveMode.MOVE) {
+		this.selectedShape.move(delta);
+		
+		// update the items that move with it
+		for (var i = 0; i < this.previewShapeStack.length; i++) {
+			this.previewShapeStack[i].move(delta);
+		}
+	} else {
+		// on resize
+		this.selectedShape.resize(mouseEnd);
+		this._updatePreviewShapeStack();
+	}
+	
 	this.selectedShape.draw(this.previewLayer);
+	this._drawPreviewShapeStack();
 };
 
 /**
@@ -246,7 +350,7 @@ Tester.prototype.recolourSelectedShape = function () {
 		this.selectedShape.setColours(toolbar.lineColour, toolbar.lineWidth, toolbar.fillColour);
 		
 		// redraw the shape on the preview layer
-		this.clear(this.previewLayer);
+		this.clear(this.previewCanvas);
 		this.selectedShape.draw(this.previewLayer);
 	} else {
 		alert("Error - nothing selected");
@@ -296,13 +400,13 @@ $("#previewLayer").mousedown(function (e) {
 	
 	if (toolbar.tool == "select") {
 		t.trySelect(coords);
+
 		if (t.selectedShape) {
-			mouseStart = coords;
-			$("#previewLayer").css("cursor", "move");
-		} else {
-			t.deselectShape();
+			// a move or a resize, or a simple select
+			t.startMoveSelectedShape(coords);
 		}
 	} else {
+		// it's a preview if a shape is selected
 		t.deselectShape();
 		t.startPreview(coords);	
 	}
@@ -313,32 +417,41 @@ $("#previewLayer").mousemove(function (e) {
 	$("#canvasCoords").text(coords.toString());
 	
 	if (t.selectedShape && t.selectedShape.intersects(coords)) {
-		if (! mouseStart) {
-			$("#previewLayer").css("cursor", "pointer");
-		} else {
-			// leave the cursor as it is (should be move)
+		if (t.mouseStart) {
+			// i.e. the mouse is currently down
 			$("#previewLayer").css("cursor", "move");
+		} else {
+			$("#previewLayer").css("cursor", "pointer");
 		}	
 	} else {
 		$("#previewLayer").css("cursor", "auto");
 	}
 
-	if(toolbar.tool == "select" && t.selectedShape && mouseStart) {
-		var mouseDelta = util.toCanvasCoords(e).sub(mouseStart);
-		t.moveSelectedShape(mouseDelta);
-		mouseStart = coords;
-	} else if (toolbar.tool == "select") {
+	if(toolbar.tool == "select" && t.selectedShape && t.mouseStart) {
+		// mouse is down and select tool, so it's a move or resize
+		t.moveSelectedShape(coords);
 	} else if (t.currentShape) {
+		// mouse is down and shape being created
         t.previewShape(coords);
     }
 });
 
 $("#previewLayer").mouseup(function (e) {
-	if (toolbar.tool == "select" && t.selectedShape && mouseStart) {
-		mouseStart = false;
-		$("#previewLayer").css("cursor", "pointer");
+	if (toolbar.tool == "select" && t.selectedShape && t.mouseStart) {
+		// mouse was down and select tool
+		t.endMoveSelectedShape();
 	} else if (t.currentShape) {
    		t.endPreviewShape(util.toCanvasCoords(e));
+	}
+});
+
+// degenerate case of user moving mouse away from canvas while dragging something
+$("#previewLayer").mouseout(function (e) {
+	if (toolbar.tool == "select" && t.selectedShape && t.mouseStart) {
+		// mouse was down and select tool
+		t.endMoveSelectedShape();
+	} else if (t.currentShape) {
+   		t.endPreviewShape();
 	}
 });
 

@@ -4,8 +4,7 @@
  * @param {Number} y The y-coordinate
  */
 function Vector(x, y) {
-	this.x = x;
-	this.y = y;
+	this.x = x, this.y = y;
 }
 
 /**

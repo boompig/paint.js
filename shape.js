@@ -16,12 +16,6 @@ function Shape(name, drawStart, drawEnd, lineColour, lineWidth, fillColour) {
 	
 	this.selected = false;
 	this.resizePoints = new Array();
-	
-	/**
-	 * an undefined var which can be overriden by selection items 
-	 * @returns {Shape}
-	 */
-	this.parent;
 }
 
 /** 
@@ -56,10 +50,14 @@ Shape.resizeCircleLineWidth = 2;
 Shape.createResizeCircle = function (center, parent) {
 	var rVector = new Vector(Shape.resizeCircleRadius, Shape.resizeCircleRadius);
 	var a = center.sub(rVector), b = center.add(rVector);
-	var shape = new Shape("circle", a, b, Shape.resizeCircleColour, Shape.resizeCircleLineWidth);
-	shape.parent = parent;
-	return shape;
+	return new Shape("circle", a, b, Shape.resizeCircleColour, Shape.resizeCircleLineWidth);;
 };
+
+/**
+ * Const governing what to return if a point intersects the resize circle
+ * @returns {Number}
+ */
+Shape.intersectsResizeCircle = 2;
 
 /**
  * Return the selection circles for this shape.
@@ -157,7 +155,7 @@ Shape.prototype.move = function(moveVector) {
 	this.drawEnd = this.drawEnd.add(moveVector);
 	
 	for(var i = 0; i < this.resizePoints.length; i++) {
-		this.resizePoints[i].add(moveVector);
+		this.resizePoints[i] = this.resizePoints[i].add(moveVector);
 	}
 };
 
@@ -257,7 +255,7 @@ Shape.prototype.draw = function(context) {
 		case "circle":
 			this.drawCircle(context);
 			break;
-	}
+	}	
 };
 
 /**
@@ -266,7 +264,7 @@ Shape.prototype.draw = function(context) {
  * @param {Vector} center The centre of the square.
  * @param {Number} radius Half the side length of the square
  */
-Shape.prototype.drawSelectionSquare = function(context, center, radius) {
+Shape.prototype._drawSelectionSquare = function(context, center, radius) {
 	var c = "#1B94E0"; // line colour
 	
 	context.save();
@@ -326,7 +324,7 @@ Shape.prototype.drawCircle = function(context) {
 	this._endDraw(context);
 	
 	if (this.selected) {
-		this.drawSelectionSquare(context, center, this.radius);
+		this._drawSelectionSquare(context, center, this.radius);
 	}
 };
 
