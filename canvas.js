@@ -88,8 +88,6 @@ Canvas.prototype.trySelect = function (selectPos) {
 	// first check for an intersection on the preview stack
 	for(var j = 0; j < this.previewShapeStack.length; j++) {
 		if (this.previewShapeStack[j].intersects(selectPos)) {
-			console.log("resize detected");
-			// console.log(this.previewShapeStack[j]);
 			this.selectedShape.setDragPt(this.previewShapeStack[j].getCenter());
 			this.mode = Canvas.moveMode.RESIZE;
 			return;
