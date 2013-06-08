@@ -10,17 +10,29 @@ Explore these functions in canvas context:
 Differences between Chrome and FF (Mac):
 	- FF:
 		- colour preview canvas doesn't update even though change event registers and shape is redrawn
+			- To reproduce:
+				- select a shape on the canvas (using select tool)
+				- click 'Random fill colour' button
+				- notice small preview canvas does not change colour
+		
 			- HOWEVER: 
 				- updates on ALT+TAB
 				- works when debug point set in firebug
 				- works on Chrome
 		
 		-  preview layer doesn't add a shape when moving mouse around (though only tried w/ trackpad)
+			- To reproduce:
+				- start drawing a tool on the canvas
+				- notice that shape does not extend all the way to mouse pointer
+		
 			- HOWEVER:
 				- works on Chrome (kind of)
 				
 	- Chrome
-		- rectangles don't fill on main canvas
+		- creates filled rectangles instead of circles??? 
+			- To reproduce:
+				- try drawing a circle
+		
 			- HOWEVER:
 				- works on FF
 				- works on colour preview canvas (and the same code is used in both places)
