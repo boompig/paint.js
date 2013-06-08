@@ -22,7 +22,7 @@ function Toolbar() {
 	var obj = this;
 	
 	$("#randomColourButton").click(function() {
-		var colour = util.randomColour().substring(1);
+		var colour = Utils.randomColour().substring(1);
 		
 		if (obj.tool == "line" || (obj.currentShape && obj.currentShape.name == "line")) {
 			$("#lineColour").val(colour).change();
@@ -80,7 +80,7 @@ Toolbar.prototype.setPreview = function(shape) {
 	var drawEnd = new Vector(canvas.width - this.offset, canvas.height - this.offset);
 	this.currentShape.setSize(drawStart, drawEnd);
 	
-	util.clearCanvas(canvas);
+	Utils.clearCanvas(canvas);
 	this.currentShape.draw(context);
 	
 	// show the applyColoursButton, but disable it
@@ -118,7 +118,7 @@ Toolbar.prototype.previewColour = function() {
 		} 
 	}
 	
-	if(util.isColour(bg)) {
+	if(Utils.isColour(bg)) {
 		$(".colourField.fill").css("border-color", "green");
 		if (bg != this.fillColour) {
 			this.fillColour = bg;
@@ -128,7 +128,7 @@ Toolbar.prototype.previewColour = function() {
 		allGood = false;
 	}
 	
-	if(util.isColour(outline)) {
+	if(Utils.isColour(outline)) {
 		$(".colourField.line").css("border-color", "green");
 		if (outline != this.lineColour) {
 			this.lineColour = outline;
@@ -138,7 +138,7 @@ Toolbar.prototype.previewColour = function() {
 		allGood = false;
 	}
 	
-	util.clearCanvas(canvas);
+	Utils.clearCanvas(canvas);
 	
 	if (allGood) {
 		// there is a different 'good' configuration from what was there before
