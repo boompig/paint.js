@@ -209,7 +209,7 @@ Shape.prototype.intersects = function(p) {
 			return (((a.x <= p.x) && (p.x <= b.x)) || ((b.x <= p.x) && (p.x <= a.x))) && (((a.y <= p.y) && (p.y <= b.y)) || ((b.y <= p.y) && (p.y <= a.y)));
 		case "line":
 			var closeEnough = 9; // has to be this close to the line
-			var dist = util.minLineSegmentDist(this, p);
+			var dist = Utils.minLineSegmentDist(this, p);
 			return dist <= closeEnough;
 	}
 };
