@@ -1,10 +1,9 @@
-var util = new Utils(); // for quick reference to utils
 var toolbar = new Toolbar();
 
 /**
  * The main wrapper class for this application.
  */
-function Tester() {
+function Canvas() {
 	this.previewCanvas = $("#previewLayer")[0];
 	this.previewLayer = this.previewCanvas.getContext("2d");
 	
@@ -40,7 +39,7 @@ function Tester() {
 /**
  * Different possible actions depending on where mouse was clicked
  */
-Tester.moveMode = {
+Canvas.moveMode = {
 	RESIZE : 1,
 	MOVE : 2
 };
@@ -49,7 +48,7 @@ Tester.moveMode = {
  * Called at the start of the preview. Usually mousedown or click on canvas.
  * @param {Vector} drawStart The starting point for the shape.
  */
-Tester.prototype.startPreview = function(drawStart) {
+Canvas.prototype.startPreview = function(drawStart) {
 	this.currentShape = new Shape(toolbar.tool, drawStart, drawStart, toolbar.lineColour, toolbar.lineWidth, toolbar.fillColour);
 	// this._updatePreviewShapeStack();
 };
@@ -58,7 +57,7 @@ Tester.prototype.startPreview = function(drawStart) {
  * Draw a preview of the shape on the preview canvas.
  * @param {Vector} drawEnd The end point for the shape.
  */
-Tester.prototype.previewShape = function (drawEnd) {
+Canvas.prototype.previewShape = function (drawEnd) {
 	this.clear(this.previewCanvas);
 	this.currentShape.resize(drawEnd);
 	
@@ -69,7 +68,7 @@ Tester.prototype.previewShape = function (drawEnd) {
  * Move the shape from the preview canvas to the base canvas.
  * @param {Vector} drawEnd The end point for the shape.
  */
-Tester.prototype.endPreviewShape = function (drawEnd) {
+Canvas.prototype.endPreviewShape = function (drawEnd) {
 	if (drawEnd)
 		this.currentShape.resize(drawEnd);
 	
@@ -85,14 +84,14 @@ Tester.prototype.endPreviewShape = function (drawEnd) {
  * Try to select top-most elements first.
  * @param {Vector} selectPos Where selection is being applied.
  */
-Tester.prototype.trySelect = function (selectPos) {
+Canvas.prototype.trySelect = function (selectPos) {
 	// first check for an intersection on the preview stack
 	for(var j = 0; j < this.previewShapeStack.length; j++) {
 		if (this.previewShapeStack[j].intersects(selectPos)) {
 			console.log("resize detected");
 			// console.log(this.previewShapeStack[j]);
 			this.selectedShape.setDragPt(this.previewShapeStack[j].getCenter());
-			this.mode = Tester.moveMode.RESIZE;
+			this.mode = Canvas.moveMode.RESIZE;
 			return;
 		}
 	}
@@ -112,7 +111,7 @@ Tester.prototype.trySelect = function (selectPos) {
 			
 			this.selectShape(shape);
 			this.redraw();
-			this.mode = Tester.moveMode.MOVE;
+			this.mode = Canvas.moveMode.MOVE;
 			return;
 		}
 		
@@ -123,9 +122,9 @@ Tester.prototype.trySelect = function (selectPos) {
 /**
  * Redraw all the objects on the main canvas.
  */
-Tester.prototype.redraw = function () {
+Canvas.prototype.redraw = function () {
 	// use function call to not destroy resident shapes
-	util.clearCanvas(this.baseCanvas);
+	Utils.clearCanvas(this.baseCanvas);
 	
     for (var i = 0; i < this.shapeStack.length; i++) {
     	this.shapeStack[i].draw(this.baseLayer);
@@ -137,12 +136,12 @@ Tester.prototype.redraw = function () {
  * @param {Object} canvas The canvas.
  * @returns {boolean} True.
  */
-Tester.prototype.clear = function (canvas) {
+Canvas.prototype.clear = function (canvas) {
 	// deselect before clear
 	if (canvas == this.baseCanvas) 
 		this.deselectShape();
 	
-    util.clearCanvas(canvas);
+    Utils.clearCanvas(canvas);
     
     if(canvas === this.baseCanvas) {
     	this.shapeStack = new Array();
@@ -160,7 +159,7 @@ Tester.prototype.clear = function (canvas) {
 /**
  * Erase the currently selected shape
  */
-Tester.prototype.eraseSelectedShape = function () {
+Canvas.prototype.eraseSelectedShape = function () {
 	if (this.selectedShape) {
 		this.clear(this.previewCanvas);
 		this.selectedShape = false; // remove shape before deselecting it to prevent it from being re-added
@@ -174,7 +173,7 @@ Tester.prototype.eraseSelectedShape = function () {
  * Select the given shape.
  * @param {Shape} shape The shape to select
  */
-Tester.prototype.selectShape = function (shape) {
+Canvas.prototype.selectShape = function (shape) {
 	this.selectedShape = shape;
 	shape.selected = true;
 	
@@ -212,7 +211,7 @@ Tester.prototype.selectShape = function (shape) {
 /**
  * Redraw the preview shape stack.
  */
-Tester.prototype._drawPreviewShapeStack = function () {
+Canvas.prototype._drawPreviewShapeStack = function () {
 	for (var i = 0; i < this.previewShapeStack.length; i++) {
 		this.previewShapeStack[i].draw(this.previewLayer);
 	}
@@ -222,7 +221,7 @@ Tester.prototype._drawPreviewShapeStack = function () {
  * Update this.previewShapeStack based on this.selectedShape
  * Throw out the old items in this.previewShapeStack
  */
-Tester.prototype._updatePreviewShapeStack = function () {
+Canvas.prototype._updatePreviewShapeStack = function () {
 	this.previewShapeStack = new Array();
 	
 	var circles = this.selectedShape.getResizeCircles();
@@ -234,7 +233,7 @@ Tester.prototype._updatePreviewShapeStack = function () {
 /**
  * Deselect all shapes.
  */
-Tester.prototype.deselectShape = function () {
+Canvas.prototype.deselectShape = function () {
 	if (this.selectedShape) {
 		this.selectedShape.selected = false;
 		
@@ -260,7 +259,7 @@ Tester.prototype.deselectShape = function () {
  * Start the action of moving the selected shape.
  * @param {Vector} mouseStart The starting position of the mouse.
  */
-Tester.prototype.startMoveSelectedShape = function (mouseStart) {
+Canvas.prototype.startMoveSelectedShape = function (mouseStart) {
 	if (! this.selectedShape) {
 		alert("No shape selected")
 		return;
@@ -274,7 +273,7 @@ Tester.prototype.startMoveSelectedShape = function (mouseStart) {
  * End the action of moving the selected shape (or resize).
  * @param {Vector} mouseEnd The final position of the mouse.
  */
-Tester.prototype.endMoveSelectedShape = function (mouseEnd) {
+Canvas.prototype.endMoveSelectedShape = function (mouseEnd) {
 	this.mouseStart = false;
 	this.mode = false;
 	$("#previewLayer").css("cursor", "pointer");
@@ -286,7 +285,7 @@ Tester.prototype.endMoveSelectedShape = function (mouseEnd) {
  * Move the currently selected shape by the mouse delta
  * @param {Vector} mouseEnd The current position of the mouse.
  */
-Tester.prototype.moveSelectedShape = function (mouseEnd) {
+Canvas.prototype.moveSelectedShape = function (mouseEnd) {
 	if (! this.selectedShape) {
 		alert("No shape selected")
 		return;
@@ -295,9 +294,9 @@ Tester.prototype.moveSelectedShape = function (mouseEnd) {
 	var delta = mouseEnd.sub(this.mouseStart);
 	this.mouseStart = mouseEnd;
 	
-	util.clearCanvas(this.previewCanvas); // don't want to remove all objects, just clear it
+	Utils.clearCanvas(this.previewCanvas); // don't want to remove all objects, just clear it
 	
-	if (this.mode == Tester.moveMode.MOVE) {
+	if (this.mode == Canvas.moveMode.MOVE) {
 		this.selectedShape.move(delta);
 		
 		// update the items that move with it
@@ -317,7 +316,7 @@ Tester.prototype.moveSelectedShape = function (mouseEnd) {
 /**
  * Copy the currently selected shape back onto the canvas.
  */
-Tester.prototype.copySelectedShape = function () {
+Canvas.prototype.copySelectedShape = function () {
 	var canvasCenter = new Vector(this.baseCanvas.width / 2, this.baseCanvas.height / 2);
 	var shapeCenter = this.selectedShape.getCenter();
 	
@@ -344,7 +343,7 @@ Tester.prototype.copySelectedShape = function () {
 /**
  * Change the colouring of the currently selected shape.
  */
-Tester.prototype.recolourSelectedShape = function () {
+Canvas.prototype.recolourSelectedShape = function () {
 	if (toolbar.changed && this.selectedShape) {
 		// change properties of the selected shape
 		this.selectedShape.setColours(toolbar.lineColour, toolbar.lineWidth, toolbar.fillColour);
@@ -357,7 +356,7 @@ Tester.prototype.recolourSelectedShape = function () {
 	}
 }
 
-var t = new Tester();
+var t = new Canvas();
 
 /* listeners */
 
@@ -371,8 +370,7 @@ $(".drawtoolButton").change(function() {
 $("#clearButton").click(function () {
     t.clear(t.baseCanvas);
     t.clear(t.previewCanvas);
-    t.selectedShape = false;
-    mouseStart = false;
+    t.selectedShape = false; // remove shape without deselecting it (so just destroy it)
 });
 
 $("#copyShapeButton").click(function() {
@@ -396,7 +394,7 @@ $("#applyColoursButton").click(function() {
 /************************ Canvas mouse events *******************/
 
 $("#previewLayer").mousedown(function (e) {
-	var coords = util.toCanvasCoords(e);
+	var coords = Utils.toCanvasCoords(e);
 	
 	if (toolbar.tool == "select") {
 		t.trySelect(coords);
@@ -413,7 +411,7 @@ $("#previewLayer").mousedown(function (e) {
 });
 
 $("#previewLayer").mousemove(function (e) {
-	var coords = util.toCanvasCoords(e);
+	var coords = Utils.toCanvasCoords(e);
 	$("#canvasCoords").text(coords.toString());
 	
 	if (t.selectedShape && t.selectedShape.intersects(coords)) {
@@ -441,7 +439,7 @@ $("#previewLayer").mouseup(function (e) {
 		// mouse was down and select tool
 		t.endMoveSelectedShape();
 	} else if (t.currentShape) {
-   		t.endPreviewShape(util.toCanvasCoords(e));
+   		t.endPreviewShape(Utils.toCanvasCoords(e));
 	}
 });
 

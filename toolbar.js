@@ -3,7 +3,7 @@
  */
 
 /**
- * Wrapper for the toolbar.
+ * Wrapper for the Toolbar.prototype.
  */
 function Toolbar() {
 	/** how much off the preview canvas border to draw the preview shape */

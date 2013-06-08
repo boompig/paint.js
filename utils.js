@@ -8,7 +8,7 @@ function Utils() {
  * @param {String} colour The given colour
  * @returns {boolean}
  */
-Utils.prototype.isColour = function(colour) {
+Utils.isColour = function(colour) {
 	var pattern = /(^#[0-9A-F]{6}$)|(^#[0-9A-F]{3}$)/i;
 	return pattern.test(colour);
 };
@@ -16,7 +16,7 @@ Utils.prototype.isColour = function(colour) {
 /**
  * Clear the given canvas.
  */
-Utils.prototype.clearCanvas = function(canvas) {
+Utils.clearCanvas = function(canvas) {
 	canvas.width = canvas.width;
 };
 
@@ -25,7 +25,7 @@ Utils.prototype.clearCanvas = function(canvas) {
  * Assumed that the event target is the canvas.
  * @returns {Vector}
  */
-Utils.prototype.toCanvasCoords = function(evt) {
+Utils.toCanvasCoords = function(evt) {
     return new Vector(evt.pageX - $(evt.target).offset().left, evt.pageY - $(evt.target).offset().top);
 };
 
@@ -34,7 +34,7 @@ Utils.prototype.toCanvasCoords = function(evt) {
  * @param {Number} a (optional) Hard lower limit
  * @param {Number} b Soft upper limit
  */
-Utils.prototype.randInt = function(a, b) {
+Utils.randInt = function(a, b) {
 	if (b === undefined) {
 		b = a;
 		a = 0;
@@ -47,7 +47,7 @@ Utils.prototype.randInt = function(a, b) {
  * Return a random hex colour as string.
  * @returns {String}
  */
-Utils.prototype.randomColour = function() {
+Utils.randomColour = function() {
 	var letters = "0123456789ABCDEF".split("");
     var colour = '#';
     for (var i = 0; i < 6; i++) {
@@ -62,7 +62,7 @@ Utils.prototype.randomColour = function() {
  * @param {Shape} line
  * @param {Vector} p
  */
-Utils.prototype.minLineSegmentDist = function(line, p) {
+Utils.minLineSegmentDist = function(line, p) {
 	// rename for ease of use
 	var a = line.drawStart, b = line.drawEnd;
 	
@@ -97,7 +97,7 @@ Utils.prototype.minLineSegmentDist = function(line, p) {
  * @param {Vector} drawEnd The finish position for the rectangle.
  * @returns {Array}
  */
-Utils.prototype.rectVertices = function(drawStart, drawEnd) {
+Utils.rectVertices = function(drawStart, drawEnd) {
 	var v = new Array();
 	
 	v.push(drawStart);
