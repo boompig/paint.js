@@ -172,7 +172,8 @@ Shape.prototype._makeResizePoints = function() {
 			this.resizePoints = [a, b];
 			break;
 		case "circle":
-			var rVector = new Vector(this.radius, this.radius);
+			var r = this.radius + this.lineWidth + 1; // some breathing room around the circle
+			var rVector = new Vector(r, r);
 			var c = this.getCenter();
 			a = c.sub(rVector), b = c.add(rVector);
 			
@@ -324,7 +325,7 @@ Shape.prototype.drawCircle = function(context) {
 	this._endDraw(context);
 	
 	if (this.selected) {
-		this._drawSelectionSquare(context, center, this.radius);
+		this._drawSelectionSquare(context, center, this.radius + this.lineWidth + 1);
 	}
 };
 
