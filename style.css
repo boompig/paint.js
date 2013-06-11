@@ -33,9 +33,7 @@ canvas {
 	margin-left: auto;
 	margin-right: auto;
 	text-align: center;
-	border-width: 1px;
-	border-color: #000;
-	border-style: solid;
+	border: 1px solid #000;
 }
 
 #toolbar {
@@ -91,4 +89,22 @@ footer {
 	clear: both;
 	display: block;
 	font-size: .8em;
+}
+
+#canvasContainer {
+	display: inline-block;
+	position: relative;
+	width: 600px;
+	height: 300px;
+}
+
+#canvasContainer canvas {
+	
+	background: none repeat scroll 0 0 transparent;
+	position: absolute;
+	display: block;
+}
+
+button {
+	display: block;
 }
