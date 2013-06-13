@@ -50,6 +50,13 @@ Toolbar.prototype.setPreview = function(shape) {
 	var drawEnd = new Vector(canvas.width - this.offset, canvas.height - this.offset);
 	this.currentShape.setSize(drawStart, drawEnd);
 	
+	// change colours accordingly
+	$("#lineColour").val(this.currentShape.lineColour.substring(1, this.currentShape.lineColour.length)).change();
+	$("#outlineWidth").val(this.currentShape.lineWidth).change();
+	
+	if (this.currentShape.fillColour)
+		$("#fillColour").val(this.currentShape.fillColour.substring(1, this.currentShape.fillColour.length)).change();
+	
 	Utils.clearCanvas(canvas);
 	this.currentShape.draw(context);
 	
