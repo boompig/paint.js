@@ -90,20 +90,3 @@ Utils.minLineSegmentDist = function(line, p) {
 		return closestPt.sub(p).size();
 	}
 };
-
-/**
- * Return an array over the vertices of this rectangle.
- * @param {Vector} drawStart The starting position for the rectangle.
- * @param {Vector} drawEnd The finish position for the rectangle.
- * @returns {Array}
- */
-Utils.rectVertices = function(drawStart, drawEnd) {
-	var v = new Array();
-	
-	v.push(drawStart);
-	v.push(new Vector(drawStart.x, drawEnd.y));
-	v.push(new Vector(drawEnd.x, drawStart.y));
-	v.push(drawEnd);
-	
-	return v;
-};

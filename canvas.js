@@ -1,13 +1,11 @@
-var toolbar = new Toolbar();
-
 /**
- * The main wrapper class for this application.
+ * The wrapper class for the canvas(es).
  */
 function Canvas() {
-	this.previewCanvas = $("#previewLayer")[0];
+	this.previewCanvas = $("#previewCanvas")[0];
 	this.previewLayer = this.previewCanvas.getContext("2d");
 	
-	this.baseCanvas = $("#baseLayer")[0];
+	this.baseCanvas = $("#baseCanvas")[0];
 	this.baseLayer = this.baseCanvas.getContext("2d");
 	
 	this.shapeStack = new Array();
@@ -155,6 +153,14 @@ Canvas.prototype.clear = function (canvas) {
 };
 
 /**
+ * Remove everything from the canvas. Blank all objects.
+ */
+Canvas.prototype.clearAll = function() {
+	this.clear(this.baseCanvas);
+	this.clear(this.previewCanvas);
+};
+
+/**
  * Erase the currently selected shape
  */
 Canvas.prototype.eraseSelectedShape = function () {
@@ -229,7 +235,10 @@ Canvas.prototype._updatePreviewShapeStack = function () {
 };
 
 /**
- * Deselect all shapes.
+ * Deselect all currently selected shapes on the canvas.
+ * Move the selected shape to the baseCanvas.
+ * Clear the previewCanvas.
+ * Blank the toolbar preview.
  */
 Canvas.prototype.deselectShape = function () {
 	if (this.selectedShape) {
@@ -264,7 +273,7 @@ Canvas.prototype.startMoveSelectedShape = function (mouseStart) {
 	}
 	
 	this.mouseStart = mouseStart;
-	$("#previewLayer").css("cursor", "move");
+	$(this.previewCanvas).css("cursor", "move");
 };
 
 /**
@@ -274,7 +283,7 @@ Canvas.prototype.startMoveSelectedShape = function (mouseStart) {
 Canvas.prototype.endMoveSelectedShape = function (mouseEnd) {
 	this.mouseStart = false;
 	this.mode = false;
-	$("#previewLayer").css("cursor", "pointer");
+	$(this.previewCanvas).css("cursor", "pointer");
 };
 
 
@@ -313,8 +322,15 @@ Canvas.prototype.moveSelectedShape = function (mouseEnd) {
 
 /**
  * Copy the currently selected shape back onto the canvas.
+ * If nothing is selected, show an error message.
+ * Return true iff successful.
  */
 Canvas.prototype.copySelectedShape = function () {
+	if (! this.selectedShape) {
+		alert("Nothing selected");
+		return false;
+	}
+	
 	var canvasCenter = new Vector(this.baseCanvas.width / 2, this.baseCanvas.height / 2);
 	var shapeCenter = this.selectedShape.getCenter();
 	
@@ -336,6 +352,8 @@ Canvas.prototype.copySelectedShape = function () {
 	
 	// select the new shape
 	this.selectShape(newShape);
+	
+	return true;
 };
 
 /**
@@ -353,102 +371,3 @@ Canvas.prototype.recolourSelectedShape = function () {
 		alert("Error - nothing selected");
 	}
 }
-
-var t = new Canvas();
-
-/* listeners */
-
-/********************* Toolbar button events ********************/
-
-$(".drawtoolButton").change(function() {
-	if (this.value != "select")
-		t.deselectShape();
-});
-
-$("#clearButton").click(function () {
-    t.clear(t.baseCanvas);
-    t.clear(t.previewCanvas);
-    t.selectedShape = false; // remove shape without deselecting it (so just destroy it)
-});
-
-$("#copyShapeButton").click(function() {
-	if(t.selectedShape) {
-		t.copySelectedShape();
-	} else {
-		alert("Nothing selected");
-	}
-});
-
-$("#eraseShapeButton").click(function() {
-	t.eraseSelectedShape();
-});
-
-$("#applyColoursButton").click(function() {
-	t.recolourSelectedShape();
-});
-
-/********************* End toolbar button events ********************/
-
-/************************ Canvas mouse events *******************/
-
-$("#previewLayer").mousedown(function (e) {
-	var coords = Utils.toCanvasCoords(e);
-	
-	if (toolbar.tool == "select") {
-		t.trySelect(coords);
-
-		if (t.selectedShape) {
-			// a move or a resize, or a simple select
-			t.startMoveSelectedShape(coords);
-		}
-	} else {
-		// it's a preview if a shape is selected
-		t.deselectShape();
-		t.startPreview(coords);	
-	}
-});
-
-$("#previewLayer").mousemove(function (e) {
-	var coords = Utils.toCanvasCoords(e);
-	$("#canvasCoords").text(coords.toString());
-	
-	if (t.selectedShape && t.selectedShape.intersects(coords)) {
-		if (t.mouseStart) {
-			// i.e. the mouse is currently down
-			$("#previewLayer").css("cursor", "move");
-		} else {
-			$("#previewLayer").css("cursor", "pointer");
-		}	
-	} else {
-		$("#previewLayer").css("cursor", "auto");
-	}
-
-	if(toolbar.tool == "select" && t.selectedShape && t.mouseStart) {
-		// mouse is down and select tool, so it's a move or resize
-		t.moveSelectedShape(coords);
-	} else if (t.currentShape) {
-		// mouse is down and shape being created
-        t.previewShape(coords);
-    }
-});
-
-$("#previewLayer").mouseup(function (e) {
-	if (toolbar.tool == "select" && t.selectedShape && t.mouseStart) {
-		// mouse was down and select tool
-		t.endMoveSelectedShape();
-	} else if (t.currentShape) {
-   		t.endPreviewShape(Utils.toCanvasCoords(e));
-	}
-});
-
-// degenerate case of user moving mouse away from canvas while dragging something
-$("#previewLayer").mouseout(function (e) {
-	if (toolbar.tool == "select" && t.selectedShape && t.mouseStart) {
-		// mouse was down and select tool
-		t.endMoveSelectedShape();
-	} else if (t.currentShape) {
-   		t.endPreviewShape();
-	}
-});
-
-/************************ End canvas mouse events *******************/

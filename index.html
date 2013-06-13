@@ -12,6 +12,10 @@
 		<script src="vector.js"></script>
 		<script src="utils.js"></script>
 		<script src="shape.js"></script>
+		
+		<!-- wrappers for GUI objects -->
+		<script src="toolbar.js"></script>
+		<script src="canvas.js"></script>
 	</head>
 	
 	<body>
@@ -54,13 +58,12 @@
 		</div> <!-- end toolbar -->
 		
 		<div id="canvasContainer">
-			<canvas id="baseLayer" width="600" height="300"><!-- nothing here --></canvas>
-			<canvas id="previewLayer" width="600", height="300"><!-- nothing here--></canvas>
+			<canvas id="baseCanvas" width="600" height="300"><!-- nothing here --></canvas>
+			<canvas id="previewCanvas" width="600", height="300"><!-- nothing here--></canvas>
 		</div>
 		<div id="canvasCoords"><!-- auto-gen --></div>
 		
-		<!-- wrappers for GUI objects. Deferred because they add listeners -->
-		<script src="toolbar.js" defer="defer"></script>
-		<script src="canvas.js" defer="defer"></script>
+		<!-- main body -->
+		<script src="script.js" defer="defer"></script>
 	</body>
 </html>

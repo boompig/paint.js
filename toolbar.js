@@ -17,36 +17,6 @@ function Toolbar() {
 	this.lineWidth;	
 	/* the shape currently being worked on */
 	this.currentShape;
-	
-	/* make listeners */
-	var obj = this;
-	
-	$("#randomColourButton").click(function() {
-		var colour = Utils.randomColour().substring(1);
-		
-		if (obj.tool == "line" || (obj.currentShape && obj.currentShape.name == "line")) {
-			$("#lineColour").val(colour).change();
-		} else {
-			$("#fillColour").val(colour).change();
-		}
-	});
-	
-	$(".drawtoolButton").change(function() {
-		obj.setTool(this.value);
-	});
-	
-	$(".userField").each(function(i, elem) {
-		$(elem).keyup(function(e) {
-			obj.previewColour();
-		});
-		
-		$(elem).change(function(e) {
-			obj.previewColour();
-		});
-	});
-	
-	/* trigger listeners */
-	$(".drawtoolButton:checked").change();
 }
 
 /**
