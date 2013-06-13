@@ -3,3 +3,5 @@
 
 # ignore private TODO annotations
 TODO
+
+# ignore test folder with experimental stuff
