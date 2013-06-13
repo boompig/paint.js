@@ -94,15 +94,25 @@ footer {
 #canvasContainer {
 	display: inline-block;
 	position: relative;
-	width: 600px;
-	height: 300px;
 }
 
 #canvasContainer canvas {
-	
 	background: none repeat scroll 0 0 transparent;
-	position: absolute;
 	display: block;
+}
+
+/**
+ * This positioning insures that the base canvas takes up 0 height
+ */
+#baseCanvas {
+	position: absolute;
+}
+
+/**
+ * 	Put the preview canvas directly on top of the base canvas
+ */
+#previewCanvas {
+	position: relative;
 }
 
 button {
