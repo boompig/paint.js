@@ -12,6 +12,8 @@ var canvas = new Canvas();
  * attach events after load
  */
 $(function (){
+	/**************************** Colour Bar Events + JQuery UI ********************************/
+	
 	toolbar.generateSampleColours();
 	
 	$(".sampleColour").click(function() {
@@ -30,8 +32,6 @@ $(function (){
 		autoHeight: false,
 		clearStyle: true
 	});
-	
-	/**************************** Colour Bar Events ********************************/
 	
 	 $("#redSlider, #greenSlider, #blueSlider").slider({
 	 	animate: true,
@@ -68,7 +68,9 @@ $(function (){
 	
 	/**************************** End Colour Bar Events ****************************/
 	
-	/********************* Toolbar button events ********************/
+	/********************* Toolbar button events + JQuery UI ********************/
+	
+	$("#toolContainer").buttonsetv();
 	
 	$("#clearButton").click(function() { canvas.clearAll(); });
 	

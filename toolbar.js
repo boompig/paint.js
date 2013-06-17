@@ -71,28 +71,37 @@ Toolbar.prototype.setPreview = function(shape) {
 	this.currentShape.setSize(drawStart, drawEnd);
 	
 	// change colours accordingly
-	$("#lineColour").val(this.currentShape.lineColour.substring(1, this.currentShape.lineColour.length)).change();
-	$("#outlineWidth").val(this.currentShape.lineWidth).change();
+	$("#lineColour").val(this.currentShape.lineColour.substring(1)); // do not trigger event yet
+	$("#outlineWidth").val(this.currentShape.lineWidth);
 	
-	if (this.currentShape.fillColour)
-		$("#fillColour").val(this.currentShape.fillColour.substring(1, this.currentShape.fillColour.length)).change();
+	if (this.currentShape.fillColour) {
+		// do not trigger events here
+		$("#fillColour").val(this.currentShape.fillColour.substring(1));
+	}
 	
-	Utils.clearCanvas(this.canvas);
-	this.currentShape.draw(this.context);
+	this.changed = false;
 	
 	// show the applyColoursButton, but disable it
 	$("#applyColoursButton").show().attr("disabled", "disabled");
 	
-	this.changed = false;
+	// now that everything is set, we can trigger the events
+	this.setColourSliders(); // update sliders
+	$("#outlineWidth").change();
+	this.setColourFromSliders(); // trigger colour-related on-change events
+	
+	// no need for explicit draw call since triggering listeners will cause a redraw
 };
 
 /**
  * Change the value of the colour field from an external source.
  * @param {String} colour The new colour, without leading hex.
- * @param {boolean} ignoreSliders True to ignore setting the sliders.
+ * @param {boolean} ignoreSliders (optional) True to ignore setting the sliders.
+ * @param {String} type (optional) The type - fill or line
  */
-Toolbar.prototype.setColourFromExternal = function(colour, ignoreSliders) {
-	var type = $(".colourType:checked").val();
+Toolbar.prototype.setColourFromExternal = function(colour, ignoreSliders, type) {
+	if (! type)
+		type = $(".colourType:checked").val();
+		
 	// force a change action
 	$(".colourField." + type).val(colour).keyup();
 	

@@ -50,7 +50,7 @@ canvas {
 #toolbar label {
 	text-align: left;
 	/* each button on own line */
-	display: block;
+	/*display: block;*/
 	margin-bottom: 10px;
 }
 

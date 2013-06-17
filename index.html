@@ -7,7 +7,9 @@
 		<!-- external libraries and stylesheets from /lib -->
 		<script src="lib/jquery-1.9.1.js"></script>
 		<script src="lib/jquery-ui.js"></script>
-		<!-- <link rel="stylesheet" type="text/css" href="/lib/jquery-ui.css"/> -->
+		<script src="lib/jquery-ui-vertical-button-set.js"></script>
+		
+		<!-- have to have online access to use JQuery UI (could not figure out how to dl all dependencies) -->
 		<link rel="stylesheet" type="text/css" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" />
 		
 		<!-- my own stylesheets -->
@@ -31,10 +33,12 @@
 			<form name="myForm">
 				<fieldset>
 					<legend>Tool</legend>
-					<label><input type="radio" class="drawtoolButton" name="drawtool" value="select" />Select</label>
-					<label><input type="radio" class="drawtoolButton" name="drawtool" value="line" />Line</label>
-					<label><input type="radio" class="drawtoolButton" name="drawtool" value="circle" />Circle</label>
-					<label><input type="radio" class="drawtoolButton" name="drawtool" value="rect" checked="checked" />Rectangle</label>
+					<div id="toolContainer">
+						<input type="radio" class="drawtoolButton" id="selectToolButton" name="drawtool" value="select" /><label for="selectToolButton">Select</label>
+						<input type="radio" class="drawtoolButton" id="lineToolButton" name="drawtool" value="line" /><label for="lineToolButton">Line</label>
+						<input type="radio" class="drawtoolButton" id="circleToolButton" name="drawtool" value="circle" /><label for="circleToolButton">Circle</label>
+						<input type="radio" class="drawtoolButton" id="rectangleToolButton" name="drawtool" value="rect" checked="checked" /><label for="rectangleToolButton">Rectangle</label>
+					</div>
 				</fieldset>
 				<fieldset>
 					<legend>Options</legend>
