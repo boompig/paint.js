@@ -72,7 +72,7 @@ Toolbar.prototype.setPreview = function(shape) {
 	
 	// change colours accordingly
 	$("#lineColour").val(this.currentShape.lineColour.substring(1)); // do not trigger event yet
-	$("#outlineWidth").val(this.currentShape.lineWidth).change();
+	$("#outlineWidth").val(this.currentShape.lineWidth);
 	
 	if (this.currentShape.fillColour) {
 		// do not trigger events here
