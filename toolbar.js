@@ -72,7 +72,7 @@ Toolbar.prototype.setPreview = function(shape) {
 	
 	// change colours accordingly
 	$("#lineColour").val(this.currentShape.lineColour.substring(1)); // do not trigger event yet
-	$("#outlineWidth").val(this.currentShape.lineWidth);
+	$("#outlineWidth").val(this.currentShape.lineWidth).change();
 	
 	if (this.currentShape.fillColour) {
 		// do not trigger events here
@@ -88,8 +88,6 @@ Toolbar.prototype.setPreview = function(shape) {
 	this.setColourSliders(); // update sliders
 	$("#outlineWidth").change();
 	this.setColourFromSliders(); // trigger colour-related on-change events
-	
-	// no need for explicit draw call since triggering listeners will cause a redraw
 };
 
 /**
@@ -103,7 +101,7 @@ Toolbar.prototype.setColourFromExternal = function(colour, ignoreSliders, type) 
 		type = $(".colourType:checked").val();
 		
 	// force a change action
-	$(".colourField." + type).val(colour).keyup();
+	$(".colourField." + type).val(colour).change();
 	
 	if (ignoreSliders !== true)
 		this.setColourSliders();
@@ -124,10 +122,14 @@ Toolbar.prototype.setColourSliders = function () {
 	var type = $(".colourType:checked").val();
 	var colour = $(".colourField." + type).val();
 	var rgb = Utils.hexToRGB(colour);
-
-	$("#redSlider").slider("value", rgb[0]);
-	$("#greenSlider").slider("value", rgb[1]);
-	$("#blueSlider").slider("value", rgb[2]);
+	var sliders = ["#redSlider", "#greenSlider", "#blueSlider"];
+	
+	for (var i = 0; i < rgb.length; i++) {
+		// to keep number of animations low, only do this on change
+		if ($(sliders[i]).slider("value") != rgb[i]) {
+			$(sliders[i]).slider("value", rgb[i]);
+		}
+	}
 };
 
 /**

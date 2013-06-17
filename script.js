@@ -61,7 +61,7 @@ $(function (){
 		
 		$(".colourField").not("." + type).hide();
 		
-		$(".colourField." + type).show().keyup(); // trigger event on given colourField
+		$(".colourField." + type).show().change(); // trigger event on given colourField
 	});
 	
 	// $(".sampleColourContainer").selectable();
@@ -96,7 +96,7 @@ $(function (){
 	});
 	
 	$(".userField").each(function(i, elem) {
-		$(elem).keyup(function(e) {
+		$(elem).change(function(e) {
 			toolbar.previewColour();
 		});
 		
