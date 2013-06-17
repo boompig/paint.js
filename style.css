@@ -129,3 +129,7 @@ button {
 	margin-right: auto;
 	margin-left: auto;
 }
+
+fieldset {
+	margin-bottom: 10px;
+}
