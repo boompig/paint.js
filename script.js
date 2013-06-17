@@ -109,13 +109,12 @@ $(function (){
 		var coords = Utils.toCanvasCoords(e);
 		$("#canvasCoords").text(coords.toString());
 		
-		if (canvas.selectedShape && canvas.selectedShape.intersects(coords)) {
-			if (canvas.mouseStart) {
-				// i.e. the mouse is currently down
-				$("#previewCanvas").css("cursor", "move");
-			} else {
-				$("#previewCanvas").css("cursor", "pointer");
-			}	
+		if (canvas.selectedShape && canvas.mouseStart) {
+			// shape being moved
+			$("#previewCanvas").css("cursor", "move");
+		} else if (canvas.selectedShape && canvas.selectedShape.intersects(coords)) {
+			// shape being hovered over
+			$("#previewCanvas").css("cursor", "pointer");
 		} else {
 			$("#previewCanvas").css("cursor", "auto");
 		}
