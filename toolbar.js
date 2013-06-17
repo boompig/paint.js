@@ -87,14 +87,25 @@ Toolbar.prototype.setPreview = function(shape) {
 };
 
 /**
- * Change the value of the colour field from the colour sliders.
+ * Change the value of the colour field from an external source.
+ * @param {String} colour The new colour, without leading hex.
+ * @param {boolean} ignoreSliders True to ignore setting the sliders.
  */
-Toolbar.prototype.setColour = function () {
+Toolbar.prototype.setColourFromExternal = function(colour, ignoreSliders) {
 	var type = $(".colourType:checked").val();
-	var colour = Utils.hexFromRGB($("#redSlider").slider("value"), $("#greenSlider").slider("value"), $("#blueSlider").slider("value"));
-	
 	// force a change action
 	$(".colourField." + type).val(colour).keyup();
+	
+	if (ignoreSliders !== true)
+		this.setColourSliders();
+}
+
+/**
+ * Change the value of the colour field from the colour sliders.
+ */
+Toolbar.prototype.setColourFromSliders = function () {
+	var hex = Utils.hexFromRGB($("#redSlider").slider("value"), $("#greenSlider").slider("value"), $("#blueSlider").slider("value"));
+	this.setColourFromExternal(hex, true);
 };
 
 /**
@@ -181,5 +192,16 @@ Toolbar.prototype.previewColour = function() {
 		shape.draw(this.context);
 	} else {
 		$("#applyColoursButton").attr("disabled", "disabled");
+	}
+};
+
+/**
+ * Generate sample colours.
+ */
+Toolbar.prototype.generateSampleColours = function() {
+	var c = Utils.genMainColours(), e;
+	for (var i = 0; i < c.length; i++) {
+		e = $("<div></div>").addClass("sampleColour").css("background-color", "#" + c[i]);
+		$("#sampleColourContainer").append(e);
 	}
 };

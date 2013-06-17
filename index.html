@@ -62,13 +62,12 @@
 			
 			<form>
 				<fieldset>
-					<legend>Colour Type</legend>
-					
-					<label><input type="radio" class="colourType" name="colourType" value="fill" checked="checked" />Fill</label>
-					<label><input type="radio" class="colourType" name="colourType" value="line" />Line</label>
-				</fieldset>
-				<fieldset>
 					<legend>Colours</legend>
+					
+					<div id="colourTypeButtons">
+						<input type="radio" id="colourTypeFill" class="colourType" name="colourType" value="fill" checked="checked" /><label for="colourTypeFill">Fill Colour</label>
+						<input type="radio" id="colourTypeLine" class="colourType" name="colourType" value="line" /><label for="colourTypeLine">Line Colour</label>
+					</div>
 					
 					<span id="colourLabel" class="userLabel">Colour:</span>
 					<input type="text" name="fillColour" id="fillColour" class="fill colourField userField" maxlength="6" size="6" value="ffff00" readonly="readonly" />
@@ -79,6 +78,11 @@
 					<div id="blueSlider"><!-- auto-gen --></div>
 					
 					<button type="button" id="randomColourButton">Random</button>
+					
+					<div id="accordion">
+						<h5>Sample Colours</h5>
+						<div id="sampleColourContainer"><!-- auto-gen --></div>
+					</div>
 				</fieldset>
 				<fieldset>
 					<legend>Line Width</legend>

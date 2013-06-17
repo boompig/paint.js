@@ -43,6 +43,18 @@
 	border-color: #729fcf; 
 }
 
+#colourBar canvas {
+	text-align center;
+	margin: 10px auto;
+}
+
+#applyColoursButton {
+	text-align: center;
+	margin-bottom: 10px;
+	margin-right: auto;
+	margin-left: auto;
+}
+
 #outlineWidth {
 	border: 0;
 }
@@ -66,4 +78,33 @@
 #randomColourButton {
 	text-align: center;
 	margin: 0 auto;
+}
+
+#colourTypeButtons {
+	margin-bottom: 10px;
+}
+
+#colourTypeButtons label {
+	/*font-size: 1em;*/
+}
+
+#accordion {
+	padding-top: 10px;
+}
+
+.sampleColour {
+	border: 1px solid #000;
+	height: 25px;
+	width: 25px;
+	float: left;
+	margin: 4px;
+}
+
+/**
+ * 	Overrides everything except selected.
+ */
+.sampleColour:hover {
+	/*orange border*/
+	border: 3px solid #FCBA03 !important;
+	margin: 2px;
 }

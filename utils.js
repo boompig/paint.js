@@ -132,3 +132,23 @@ Utils.hexToRGB = function (hex) {
 		parseInt(hex.substring(4, 6), 16)
 	];
 };
+
+/**
+ * Generate an array of all the main colours.
+ * @returns {Array}
+ */
+Utils.genMainColours = function () {
+	var a = ["0", "f", "8"];
+	
+	var colours = new Array();
+	
+	for(var r = 0; r < a.length; r++) {
+		for (var g = 0; g < a.length; g++) {
+			for (var b = 0; b < a.length; b++) {
+				colours.push(a[r] + a[g] + a[b]);
+			}
+		}
+	}
+	
+	return colours;
+};

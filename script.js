@@ -12,15 +12,35 @@ var canvas = new Canvas();
  * attach events after load
  */
 $(function (){
+	toolbar.generateSampleColours();
+	
+	$(".sampleColour").click(function() {
+		// comma-seperated list
+		var rgb = $(this).css("background-color").replace("rgb(", "").replace(")", "").split(", ");
+		var hex = Utils.hexFromRGB(rgb[0], rgb[1], rgb[2]);
+		toolbar.setColourFromExternal(hex);
+	});
+	
+	$("#colourTypeButtons").buttonset();
+	
+	$("#accordion").accordion({
+		collapsible: true,
+		active: false,
+		heightStyle: "content",
+		autoHeight: false,
+		clearStyle: true
+	});
+	
 	/**************************** Colour Bar Events ********************************/
 	
 	 $("#redSlider, #greenSlider, #blueSlider").slider({
+	 	animate: true,
 		orientation: "horizontal",
 		range: "min",
 		max: 255,
 		value: 127,
-		slide: function (e, elem) { toolbar.setColour(); },
-		change: function (e, elem) { toolbar.setColour(); }
+		slide: function (e, elem) { toolbar.setColourFromSliders(); },
+		change: function (e, elem) { toolbar.setColourFromSliders(); }
 	});
 	
 	$("#lineWidthSlider").slider({
@@ -44,6 +64,8 @@ $(function (){
 		$(".colourField." + type).show().keyup(); // trigger event on given colourField
 	});
 	
+	// $(".sampleColourContainer").selectable();
+	
 	/**************************** End Colour Bar Events ****************************/
 	
 	/********************* Toolbar button events ********************/
@@ -58,10 +80,7 @@ $(function (){
 	
 	$("#randomColourButton").click(function() {
 		var colour = Utils.randomColour().substring(1);
-		var type = $(".colourType:checked").val();
-		
-		$(".colourField." + type).val(colour).change();
-		toolbar.setColourSliders();
+		toolbar.setColourFromExternal(colour);
 	});
 	
 	/********************* End toolbar button events ********************/
