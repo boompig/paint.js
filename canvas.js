@@ -144,7 +144,7 @@ Canvas.prototype.clear = function (canvas) {
     	
     	// update the toolbar
     	toolbar.currentShape = false;
-    	toolbar.previewColour()
+    	toolbar.previewColour();
     } else {
     	this.previewShapeStack = new Array();
     }
@@ -210,6 +210,7 @@ Canvas.prototype.selectShape = function (shape) {
 	
 	$("#eraseShapeButton").removeAttr("disabled");
 	$("#copyShapeButton").removeAttr("disabled");
+	$("#colourBar").show();
 };
 
 /**
@@ -260,6 +261,9 @@ Canvas.prototype.deselectShape = function () {
 	$("#eraseShapeButton").attr("disabled", "disabled");
 	$("#copyShapeButton").attr("disabled", "disabled");
 	$("#applyColoursButton").attr("disabled", "disabled");
+	
+	if (toolbar.tool == "select")
+		$("#colourBar").hide();
 };
 
 /**
@@ -367,6 +371,10 @@ Canvas.prototype.recolourSelectedShape = function () {
 		// redraw the shape on the preview layer
 		this.clear(this.previewCanvas);
 		this.selectedShape.draw(this.previewLayer);
+		
+		// add resize circles to preview canvas
+		this._updatePreviewShapeStack();
+		this._drawPreviewShapeStack();
 	} else {
 		alert("Error - nothing selected");
 	}

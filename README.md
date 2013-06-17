@@ -32,3 +32,4 @@ This repo contains the code for the first assignment in CSC309.
 # Libraries Used
 
 * JQuery
+* JQuery UI

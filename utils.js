@@ -90,3 +90,45 @@ Utils.minLineSegmentDist = function(line, p) {
 		return closestPt.sub(p).size();
 	}
 };
+
+/**
+ * Return the hex colour taken from the given red, green, and blue values in decimal.
+ * No prepended hashtag.
+ * Taken from: http://jqueryui.com/slider/#colorpicker, slightly modded
+ * @param {Number} r Red colour value
+ * @param {Number} g Green colour value
+ * @param {Number} b Blue colour value
+ * @returns {String}
+ */
+Utils.hexFromRGB = function(r, g, b) {
+	 var hex = [
+		Number(r).toString( 16 ),
+		Number(g).toString( 16 ),
+		Number(b).toString( 16 )
+	];
+	
+	for (var i = 0; i < hex.length; i++) {
+		if (hex[i].length === 1 )
+			hex[i] = "0" + hex[i];
+	}
+	
+	return hex.join("").toUpperCase();
+};
+
+/**
+ * Convert given hex string to array of colours [red, green, blue] where each entry is a number.
+ * No prepended hashtag.
+ * @param {String} hex
+ * @returns {Array}
+ */
+Utils.hexToRGB = function (hex) {
+	// force to 6 chars
+	if (hex.length === 3)
+		hex = "0" + hex.split("").join("0");
+		
+	return [
+		parseInt(hex.substring(0, 2), 16),
+		parseInt(hex.substring(2, 4), 16),
+		parseInt(hex.substring(4, 6), 16)
+	];
+};

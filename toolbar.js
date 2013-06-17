@@ -10,6 +10,9 @@ function Toolbar() {
 	this.offset = 2;
 	this.changed = false;
 	
+	this.canvas = $("#colourPreview")[0];
+	this.context = this.canvas.getContext("2d");
+	
 	/** uninstantiated stuff, it's fine if they are undefined for now */
 	this.tool;
 	this.fillColour;
@@ -26,14 +29,32 @@ function Toolbar() {
 Toolbar.prototype.setTool = function(toolText) {
 	this.tool = toolText;
 	
+	if (this.tool == "line") {
+		$(".colourType[value=fill]").attr("disabled", "disabled");
+		$(".colourType[value=line]").click();
+	} else
+		$(".colourType[value=fill]").removeAttr("disabled");
+	
 	if (this.tool != "select") {
 		// hide when there is no select
 		$("#applyColoursButton").hide();
 		// shape being worked on has changed
 		this.currentShape = false;
+		$("#colourBar").show();
+	} else {
+		$("#colourBar").hide();
 	}
 	
 	this.previewColour(); 
+};
+
+/**
+ * Set the outline width to the given value.
+ * @param {Number} value The value to set it to.
+ */
+Toolbar.prototype.setOutlineWidth = function (value) {
+	// make sure to trigger the callback on outlineWidth
+	$("#outlineWidth").val(value).change();
 };
 
 /**
@@ -41,13 +62,11 @@ Toolbar.prototype.setTool = function(toolText) {
  * @param {Shape} shape The selected shape.
  */
 Toolbar.prototype.setPreview = function(shape) {
-	var canvas = $("#colourPreview")[0];
-	var context = canvas.getContext("2d");
-	
 	this.currentShape = shape.copy();
+	var offset = this.offset + shape.lineWidth;
 	
-	var drawStart = new Vector(this.offset, this.offset);
-	var drawEnd = new Vector(canvas.width - this.offset, canvas.height - this.offset);
+	var drawStart = new Vector(offset, offset);
+	var drawEnd = new Vector(this.canvas.width - offset, this.canvas.height - offset);
 	this.currentShape.setSize(drawStart, drawEnd);
 	
 	// change colours accordingly
@@ -57,14 +76,37 @@ Toolbar.prototype.setPreview = function(shape) {
 	if (this.currentShape.fillColour)
 		$("#fillColour").val(this.currentShape.fillColour.substring(1, this.currentShape.fillColour.length)).change();
 	
-	Utils.clearCanvas(canvas);
-	this.currentShape.draw(context);
+	Utils.clearCanvas(this.canvas);
+	this.currentShape.draw(this.context);
 	
 	// show the applyColoursButton, but disable it
-	$("#applyColoursButton").show();
-	$("#applyColoursButton").attr("disabled", "disabled");
+	$("#applyColoursButton").show().attr("disabled", "disabled");
 	
 	this.changed = false;
+};
+
+/**
+ * Change the value of the colour field from the colour sliders.
+ */
+Toolbar.prototype.setColour = function () {
+	var type = $(".colourType:checked").val();
+	var colour = Utils.hexFromRGB($("#redSlider").slider("value"), $("#greenSlider").slider("value"), $("#blueSlider").slider("value"));
+	
+	// force a change action
+	$(".colourField." + type).val(colour).keyup();
+};
+
+/**
+ * Change the value of the colour sliders from the colour field
+ */
+Toolbar.prototype.setColourSliders = function () {
+	var type = $(".colourType:checked").val();
+	var colour = $(".colourField." + type).val();
+	var rgb = Utils.hexToRGB(colour);
+
+	$("#redSlider").slider("value", rgb[0]);
+	$("#greenSlider").slider("value", rgb[1]);
+	$("#blueSlider").slider("value", rgb[2]);
 };
 
 /**
@@ -74,7 +116,6 @@ Toolbar.prototype.setPreview = function(shape) {
  * 		+ shape
  */
 Toolbar.prototype.previewColour = function() {
-	var canvas = $("#colourPreview")[0];
 	var allGood = true;
 	var bg = "#" + $(".colourField.fill").val();
 	var outline = "#" + $(".colourField.line").val();
@@ -91,7 +132,6 @@ Toolbar.prototype.previewColour = function() {
 		$("#outlineWidth").css("border-color", "green");
 		if (w != this.lineWidth) {
 			this.lineWidth = parseInt(w);
-			// console.log("changed line width");
 		} 
 	}
 	
@@ -115,7 +155,7 @@ Toolbar.prototype.previewColour = function() {
 		allGood = false;
 	}
 	
-	Utils.clearCanvas(canvas);
+	Utils.clearCanvas(this.canvas);
 	
 	if (allGood) {
 		// there is a different 'good' configuration from what was there before
@@ -125,18 +165,19 @@ Toolbar.prototype.previewColour = function() {
 		if (this.currentShape)
 			$("#applyColoursButton").removeAttr("disabled");
 			
-		var context = canvas.getContext("2d"), shape;
+		var shape;
 		
 		if (this.tool == "select" && this.currentShape) {
 			shape = this.currentShape;
 			shape.setColours(this.lineColour, this.lineWidth, this.fillColour);
 		} else {
-			var drawStart = new Vector(this.offset, this.offset);
-			var drawEnd = new Vector(canvas.width - this.offset, canvas.height - this.offset);
+			var offset = this.offset + this.lineWidth;
+			var drawStart = new Vector(offset, offset);
+			var drawEnd = new Vector(this.canvas.width - offset, this.canvas.height - offset);
 			shape = new Shape(this.tool, drawStart, drawEnd, this.lineColour, this.lineWidth, this.fillColour);
 		}
 		
-		shape.draw(context);
+		shape.draw(this.context);
 	} else {
 		$("#applyColoursButton").attr("disabled", "disabled");
 	}
