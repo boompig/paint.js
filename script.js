@@ -37,7 +37,6 @@ $(function (){
 	
 	$(".colourType").change(function() {
 		var type = $(this).val();
-		console.log(type);
 		toolbar.setColourSliders();
 		
 		$(".colourField").not("." + type).hide();

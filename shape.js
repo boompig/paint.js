@@ -11,11 +11,11 @@ function Shape(name, drawStart, drawEnd, lineColour, lineWidth, fillColour) {
 	this.name = name;
 	this.uid = Shape.uid++;
 	
-	this.setSize(drawStart, drawEnd);
-	this.setColours(lineColour, lineWidth, fillColour);
-	
-	this.selected = false;
 	this.resizePoints = new Array();
+	// setColours must be before setSize
+	this.setColours(lineColour, lineWidth, fillColour);
+	this.setSize(drawStart, drawEnd);
+	this.selected = false;
 }
 
 /** 
@@ -275,15 +275,6 @@ Shape.prototype._drawSelectionSquare = function(context, center, radius) {
 	
 	var rVector = new Vector(radius, radius);
 	var a = center.sub(rVector), b = center.add(rVector);
-
-	// create selection points for circle / rect
-	this.selectionPoints = new Array();
-	this.selectionPoints.push(a);
-	this.selectionPoints.push(new Vector(a.x, b.y));
-	this.selectionPoints.push(b);
-	this.selectionPoints.push(new Vector(b.x, a.y));
-	
-	// var v = this.drawEnd.sub(this.drawStart);
 	
 	// create the square / rectangle
 	context.beginPath();
