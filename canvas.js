@@ -209,10 +209,12 @@ Canvas.prototype.selectShape = function (shape) {
 	toolbar.setPreview(this.selectedShape);
 	
 	if (toolbar.tool == "select" && this.selectedShape.name == "line") {
-		$(".colourType[value=fill]").attr("disabled", "disabled");
+		$(".colourType[value=fill]").button({disabled: true});
+		// $(".colourType[value=fill]").attr("disabled", "disabled");
 		$(".colourType[value=line]").click();
 	} else {
-		$(".colourType[value=fill]").removeAttr("disabled");
+		$(".colourType[value=fill]").button({disabled: false});
+		// $(".colourType[value=fill]").removeAttr("disabled");
 	}
 	
 	$("#eraseShapeButton").removeAttr("disabled");
@@ -267,7 +269,7 @@ Canvas.prototype.deselectShape = function () {
 	
 	$("#eraseShapeButton").attr("disabled", "disabled");
 	$("#copyShapeButton").attr("disabled", "disabled");
-	$("#applyColoursButton").attr("disabled", "disabled");
+	$("#applyColoursButton").hide();
 	
 	if (toolbar.tool == "select")
 		$("#colourBar").hide();
@@ -371,7 +373,7 @@ Canvas.prototype.copySelectedShape = function () {
  * Change the colouring of the currently selected shape.
  */
 Canvas.prototype.recolourSelectedShape = function () {
-	if (toolbar.changed && this.selectedShape) {
+	if (this.selectedShape) {
 		// change properties of the selected shape
 		this.selectedShape.setColours(toolbar.lineColour, toolbar.lineWidth, toolbar.fillColour);
 		

@@ -142,7 +142,14 @@ Shape.prototype.resize = function (dragPt) {
  * @param {String} fillColour A hex for the fill colour
  */
 Shape.prototype.setColours = function(lineColour, lineWidth, fillColour) {
-	this.lineColour = lineColour, this.lineWidth = lineWidth, this.fillColour = fillColour;
+	this.lineColour = lineColour, this.fillColour = fillColour;
+	
+	if (lineWidth !== this.lineWidth && this.selected) {
+		this.lineWidth = lineWidth;
+		this._makeResizePoints(); // re-calculate resize points
+	} else {
+		this.lineWidth = lineWidth;
+	}
 };
 
 /**

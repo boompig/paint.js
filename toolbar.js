@@ -8,7 +8,6 @@
 function Toolbar() {
 	/** how much off the preview canvas border to draw the preview shape */
 	this.offset = 2;
-	this.changed = false;
 	
 	this.canvas = $("#colourPreview")[0];
 	this.context = this.canvas.getContext("2d");
@@ -30,10 +29,12 @@ Toolbar.prototype.setTool = function(toolText) {
 	this.tool = toolText;
 	
 	if (this.tool == "line" || (this.tool == "select" && this.currentShape && this.currentShape.name == "line")) {
-		$(".colourType[value=fill]").attr("disabled", "disabled");
+		// $(".colourType[value=fill]").attr("disabled", "disabled");
+		$(".colourType[value=fill]").button({disabled: true});
 		$(".colourType[value=line]").click();
 	} else {
-		$(".colourType[value=fill]").removeAttr("disabled");
+		$(".colourType[value=fill]").button({disabled: false});
+		// $(".colourType[value=fill]").removeAttr("disabled");
 	}
 	
 	if (this.tool != "select") {
@@ -79,32 +80,31 @@ Toolbar.prototype.setPreview = function(shape) {
 		$("#fillColour").val(this.currentShape.fillColour.substring(1));
 	}
 	
-	this.changed = false;
-	
-	// show the applyColoursButton, but disable it
-	$("#applyColoursButton").show().attr("disabled", "disabled");
-	
 	// now that everything is set, we can trigger the events
 	this.setColourSliders(); // update sliders
-	$("#outlineWidth").change();
+	$("#lineWidthSlider").slider("value", this.currentShape.lineWidth);
 	this.setColourFromSliders(); // trigger colour-related on-change events
+	
+	// dirty hack (corrects for other hack in setColourFromExternal)
+	$("#applyColoursButton").attr("disabled", "disabled");
 };
 
 /**
  * Change the value of the colour field from an external source.
  * @param {String} colour The new colour, without leading hex.
  * @param {boolean} ignoreSliders (optional) True to ignore setting the sliders.
- * @param {String} type (optional) The type - fill or line
  */
-Toolbar.prototype.setColourFromExternal = function(colour, ignoreSliders, type) {
-	if (! type)
-		type = $(".colourType:checked").val();
-		
-	// force a change action
-	$(".colourField." + type).val(colour).change();
+Toolbar.prototype.setColourFromExternal = function(colour, ignoreSliders) {
+	var type = $(".colourType:checked").val();
+	$(".colourField." + type).val(colour);
 	
 	if (ignoreSliders !== true)
 		this.setColourSliders();
+		
+	// dirty hack
+	if(this.tool == "selected" && this.currentShape)
+	$("#applyColoursButton").removeAttr("disabled");
+	this.previewColour();
 }
 
 /**
@@ -139,15 +139,20 @@ Toolbar.prototype.setColourSliders = function () {
  * 		+ shape
  */
 Toolbar.prototype.previewColour = function() {
+	// checks for errors in input
 	var allGood = true;
+	
+	// read in configuration
 	var bg = "#" + $(".colourField.fill").val();
 	var outline = "#" + $(".colourField.line").val();
 	var w = $("#outlineWidth").val();
 	
+	// means nothing selected
 	if (this.tool == "select" && ! this.currentShape) {
 		allGood = false;
 	}
 	
+	// line width
 	if (isNaN(w) || parseInt(w) < 0 || parseInt(w) > parseInt($("#outlineWidth").attr("max"))) {
 		$("#outlineWidth").css("border-color", "red");
 		allGood = false;
@@ -158,6 +163,7 @@ Toolbar.prototype.previewColour = function() {
 		} 
 	}
 	
+	// fill colour
 	if(Utils.isColour(bg)) {
 		$(".colourField.fill").css("border-color", "green");
 		if (bg != this.fillColour) {
@@ -168,6 +174,7 @@ Toolbar.prototype.previewColour = function() {
 		allGood = false;
 	}
 	
+	// line colour
 	if(Utils.isColour(outline)) {
 		$(".colourField.line").css("border-color", "green");
 		if (outline != this.lineColour) {
@@ -181,16 +188,11 @@ Toolbar.prototype.previewColour = function() {
 	Utils.clearCanvas(this.canvas);
 	
 	if (allGood) {
-		// there is a different 'good' configuration from what was there before
-		this.changed = true;
-		
-		// if there is a 'model', we can re-enable the apply button
-		if (this.currentShape)
-			$("#applyColoursButton").removeAttr("disabled");
-			
 		var shape;
 		
 		if (this.tool == "select" && this.currentShape) {
+			$("#applyColoursButton").show().removeAttr("disabled");
+			
 			shape = this.currentShape;
 			shape.setColours(this.lineColour, this.lineWidth, this.fillColour);
 		} else {
@@ -207,7 +209,7 @@ Toolbar.prototype.previewColour = function() {
 };
 
 /**
- * Generate sample colours.
+ * Generate sample colours, by adding fixed-size divs to #sampleColourContainer div.
  */
 Toolbar.prototype.generateSampleColours = function() {
 	var c = Utils.genMainColours(), e;
