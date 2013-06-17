@@ -208,6 +208,13 @@ Canvas.prototype.selectShape = function (shape) {
 	// preview the shape on the toolbar preview canvas
 	toolbar.setPreview(this.selectedShape);
 	
+	if (toolbar.tool == "select" && this.selectedShape.name == "line") {
+		$(".colourType[value=fill]").attr("disabled", "disabled");
+		$(".colourType[value=line]").click();
+	} else {
+		$(".colourType[value=fill]").removeAttr("disabled");
+	}
+	
 	$("#eraseShapeButton").removeAttr("disabled");
 	$("#copyShapeButton").removeAttr("disabled");
 	$("#colourBar").show();
@@ -375,6 +382,9 @@ Canvas.prototype.recolourSelectedShape = function () {
 		// add resize circles to preview canvas
 		this._updatePreviewShapeStack();
 		this._drawPreviewShapeStack();
+		
+		// now disable the apply button
+		$("#applyColoursButton").attr("disabled", "disabled");
 	} else {
 		alert("Error - nothing selected");
 	}

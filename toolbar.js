@@ -29,11 +29,12 @@ function Toolbar() {
 Toolbar.prototype.setTool = function(toolText) {
 	this.tool = toolText;
 	
-	if (this.tool == "line") {
+	if (this.tool == "line" || (this.tool == "select" && this.currentShape && this.currentShape.name == "line")) {
 		$(".colourType[value=fill]").attr("disabled", "disabled");
 		$(".colourType[value=line]").click();
-	} else
+	} else {
 		$(".colourType[value=fill]").removeAttr("disabled");
+	}
 	
 	if (this.tool != "select") {
 		// hide when there is no select
