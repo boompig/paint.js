@@ -47,7 +47,7 @@ $(function (){
 		orientation: "horizontal",
 		range: "min",
 		min: 1,
-		max: 35,
+		max: 30, // strategically set - if any higher, looks very odd
 		value: 3,
 		slide: function (e, elem) { toolbar.setOutlineWidth(elem.value); },
 		change: function (e, elem) { toolbar.setOutlineWidth(elem.value); }
