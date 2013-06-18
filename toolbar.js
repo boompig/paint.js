@@ -194,6 +194,14 @@ Toolbar.prototype.previewColour = function() {
 			$("#applyColoursButton").show().removeAttr("disabled");
 			
 			shape = this.currentShape;
+			
+			// should be negative if shape.lineWidth is less than new
+			var diff = shape.lineWidth - this.lineWidth;
+			var vDiff = new Vector(diff, diff);
+			
+			// have to resize shape :(
+			shape.setSize(shape.drawStart.sub(vDiff), shape.drawEnd.add(vDiff));
+			
 			shape.setColours(this.lineColour, this.lineWidth, this.fillColour);
 		} else {
 			var offset = this.offset + this.lineWidth;
