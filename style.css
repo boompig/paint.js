@@ -107,8 +107,9 @@ footer {
 	position: relative;
 }
 
-button {
+#toolbar button, #colourBar button {
 	display: block;
+	margin: 5px;
 }
 
 #colourBar {

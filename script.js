@@ -12,6 +12,12 @@ var canvas = new Canvas();
  * attach events after load
  */
 $(function (){
+	/**************************** Change general visuals with JQuery UI ********************************/
+	
+	$("button").button();
+	
+	/**************************** End JQuery UI main body **********************************************/
+	
 	/**************************** Colour Bar Events + JQuery UI ********************************/
 	
 	toolbar.generateSampleColours();

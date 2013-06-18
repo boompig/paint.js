@@ -29,12 +29,12 @@ Toolbar.prototype.setTool = function(toolText) {
 	this.tool = toolText;
 	
 	if (this.tool == "line" || (this.tool == "select" && this.currentShape && this.currentShape.name == "line")) {
-		// $(".colourType[value=fill]").attr("disabled", "disabled");
+		// $(".colourType[value=fill]").button({disabled: true});
 		$(".colourType[value=fill]").button({disabled: true});
 		$(".colourType[value=line]").click();
 	} else {
 		$(".colourType[value=fill]").button({disabled: false});
-		// $(".colourType[value=fill]").removeAttr("disabled");
+		// $(".colourType[value=fill]").button({disabled: false});
 	}
 	
 	if (this.tool != "select") {
@@ -86,7 +86,7 @@ Toolbar.prototype.setPreview = function(shape) {
 	this.setColourFromSliders(); // trigger colour-related on-change events
 	
 	// dirty hack (corrects for other hack in setColourFromExternal)
-	$("#applyColoursButton").attr("disabled", "disabled");
+	$("#applyColoursButton").button({disabled: true});
 };
 
 /**
@@ -103,7 +103,7 @@ Toolbar.prototype.setColourFromExternal = function(colour, ignoreSliders) {
 		
 	// dirty hack
 	if(this.tool == "selected" && this.currentShape)
-	$("#applyColoursButton").removeAttr("disabled");
+	$("#applyColoursButton").button({disabled: false});
 	this.previewColour();
 }
 
@@ -191,7 +191,7 @@ Toolbar.prototype.previewColour = function() {
 		var shape;
 		
 		if (this.tool == "select" && this.currentShape) {
-			$("#applyColoursButton").show().removeAttr("disabled");
+			$("#applyColoursButton").show().button({disabled: false});
 			
 			shape = this.currentShape;
 			
@@ -212,7 +212,7 @@ Toolbar.prototype.previewColour = function() {
 		
 		shape.draw(this.context);
 	} else {
-		$("#applyColoursButton").attr("disabled", "disabled");
+		$("#applyColoursButton").button({disabled: true});
 	}
 };
 

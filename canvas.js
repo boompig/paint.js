@@ -210,15 +210,15 @@ Canvas.prototype.selectShape = function (shape) {
 	
 	if (toolbar.tool == "select" && this.selectedShape.name == "line") {
 		$(".colourType[value=fill]").button({disabled: true});
-		// $(".colourType[value=fill]").attr("disabled", "disabled");
+		// $(".colourType[value=fill]").button({disabled: true});
 		$(".colourType[value=line]").click();
 	} else {
 		$(".colourType[value=fill]").button({disabled: false});
-		// $(".colourType[value=fill]").removeAttr("disabled");
+		// $(".colourType[value=fill]").button({disabled: false});
 	}
 	
-	$("#eraseShapeButton").removeAttr("disabled");
-	$("#copyShapeButton").removeAttr("disabled");
+	$("#eraseShapeButton").button({disabled: false});
+	$("#copyShapeButton").button({disabled: false});
 	$("#colourBar").show();
 };
 
@@ -267,8 +267,8 @@ Canvas.prototype.deselectShape = function () {
 	toolbar.currentShape = false;
 	toolbar.previewColour();
 	
-	$("#eraseShapeButton").attr("disabled", "disabled");
-	$("#copyShapeButton").attr("disabled", "disabled");
+	$("#eraseShapeButton").button({disabled: true});
+	$("#copyShapeButton").button({disabled: true});
 	$("#applyColoursButton").hide();
 	
 	if (toolbar.tool == "select")
@@ -386,7 +386,7 @@ Canvas.prototype.recolourSelectedShape = function () {
 		this._drawPreviewShapeStack();
 		
 		// now disable the apply button
-		$("#applyColoursButton").attr("disabled", "disabled");
+		$("#applyColoursButton").button({disabled: true});
 	} else {
 		alert("Error - nothing selected");
 	}
