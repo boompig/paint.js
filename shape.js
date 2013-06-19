@@ -243,8 +243,9 @@ Shape.prototype._prepareDraw = function(context) {
 Shape.prototype._endDraw = function(context) {
 	if (this.fillColour)
 		context.fill();
-	
-	context.stroke();
+	// lineWidth = 0 still seems to create a border. To stop that, don't do a stroke at the end
+	if (this.lineWidth > 0)
+		context.stroke();
 	context.restore();
 };
 
