@@ -191,11 +191,21 @@ Loader.prototype.triggerEvents = function() {
  * attach events after load
  */
 $(function (){
+	// hide content container
+	//$("#assignmentContainer").hide();
+	
+	// make the canvas smaller on smaller displays
+	if ($(window).width() <= 1024)
+		// the value 500 is not very scientific, but seems to work well on lower-resolution screens
+		$("#canvasContainer canvas").attr("width", "500");
+	
 	var loader = new Loader();
 	loader.createVisuals();
 	loader.configureColourbar();
 	loader.configureToolbar();
 	loader.configureCanvas();
 	loader.triggerEvents();
+	
+	//$("#assignmentContainer").show();
 });
 

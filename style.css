@@ -8,7 +8,7 @@ body {
 	font-family: Helvetica, Jura, sans-serif;
 }
 
-#container {
+#outerCanvasContainer {
 	float: left;
 	
 	/* for all child elements */
