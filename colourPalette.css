@@ -106,5 +106,5 @@
 .sampleColour:hover {
 	/* green border*/
 	border: 4px solid #A0D040 !important;
-	margin: 2px;
+	margin: 2px !important;
 }
