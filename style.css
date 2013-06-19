@@ -121,4 +121,6 @@ footer {
 
 fieldset {
 	margin-bottom: 10px;
+	/* grey */
+	border: 1px solid #888888;
 }

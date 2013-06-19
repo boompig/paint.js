@@ -40,12 +40,19 @@ Loader.prototype.configureColourbar = function () {
 	$("#colourTypeButtons").buttonset();
 	
 	$("#accordion").accordion({
-		// alwaysOpen: false,
+		alwaysOpen: false,
 		collapsible: true,
 		active: false,
 		heightStyle: "content",
 		autoHeight: false,
 		clearStyle: true
+	});
+	
+	$("#accordion").bind("mouseleave", function() {
+		$(this).accordion({"active" : false});
+	}).bind("mouseover", function() {
+		// open the accordion (true doesn't work, have to specify index, which is 0)
+		$(this).accordion({"active" : 0});
 	});
 	
 	 $("#redSlider, #greenSlider, #blueSlider").slider({
