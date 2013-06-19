@@ -208,15 +208,24 @@ Shape.prototype._makeResizePoints = function() {
 Shape.prototype.intersects = function(p) {
 	// rename for ease of use
 	var a = this.drawStart, b = this.drawEnd;
+	var closeEnough = 9; // has to be this close to the line
 	
 	switch (this.name) {
 		case "circle":
+			// special case for very small shape
+			var minRadiusSq = closeEnough;
 			var rSquared = p.sub(this.getCenter()).sizeSquared();
-			return rSquared <= Math.pow(this.radius, 2);
+			return rSquared <= Math.max(minRadiusSq, Math.pow(this.radius, 2));
 		case "rect":
-			return (((a.x <= p.x) && (p.x <= b.x)) || ((b.x <= p.x) && (p.x <= a.x))) && (((a.y <= p.y) && (p.y <= b.y)) || ((b.y <= p.y) && (p.y <= a.y)));
+			// rectangle size shall be measured as size of vector from a to b
+			// if that vector's size < 9 px, then this is a small shape
+			if (a.sub(b).size() < closeEnough) {
+				var rSquared = p.sub(this.getCenter()).sizeSquared();
+				return rSquared <= closeEnough; // within 3 px of the center diagonally
+			} else {
+				return (((a.x <= p.x) && (p.x <= b.x)) || ((b.x <= p.x) && (p.x <= a.x))) && (((a.y <= p.y) && (p.y <= b.y)) || ((b.y <= p.y) && (p.y <= a.y)));
+			}
 		case "line":
-			var closeEnough = 9; // has to be this close to the line
 			var dist = Utils.minLineSegmentDist(this, p);
 			return dist <= closeEnough;
 	}
