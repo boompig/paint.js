@@ -233,8 +233,6 @@ Loader.prototype.adjustCanvasSize = function() {
  */
 $(function (){
 	// hide content container
-	//$("#assignmentContainer").hide();
-	
 	
 	var loader = new Loader();
 	loader.createVisuals();
@@ -243,7 +241,5 @@ $(function (){
 	loader.adjustCanvasSize();
 	loader.configureCanvas();
 	loader.triggerEvents();
-	
-	//$("#assignmentContainer").show();
 });
 
