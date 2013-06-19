@@ -40,6 +40,7 @@ Loader.prototype.configureColourbar = function () {
 	$("#colourTypeButtons").buttonset();
 	
 	$("#accordion").accordion({
+		// alwaysOpen: false,
 		collapsible: true,
 		active: false,
 		heightStyle: "content",
@@ -188,21 +189,51 @@ Loader.prototype.triggerEvents = function() {
 };
 
 /**
+ * Configure the canvas size to take up free space on screen.
+ * Also makes sure that toolbars do not wrap on small screens.
+ */
+Loader.prototype.adjustCanvasSize = function() {
+	var contentWidth = $("#toolbar").width() + $("#colourBar").width() + $("#outerCanvasContainer").width();
+	var freeSpace = $(window).width() - contentWidth;
+	var idealFreeSpace = 100; // very scientifically arrived at this value with 0 guesswork
+	
+	// console.log($(window).width());
+	// console.log(contentWidth);
+	
+	var expandWidth = freeSpace - idealFreeSpace;
+	var canvasWidth = Number($("#canvasContainer canvas").attr("width"));
+	var newCanvasWidth = canvasWidth + expandWidth;
+	if (newCanvasWidth <= 100) {
+		// this is far too small
+		// what kind of idiotic screen size do you have!?!?!
+		newCanvasWidth = 300; // this is basically the smallest usable size
+	}
+	
+	// console.log(freeSpace);
+	// console.log(expandWidth);
+	// console.log(canvasWidth);
+	// console.log(newCanvasWidth);
+	
+	$("#canvasContainer canvas").attr("width", newCanvasWidth);
+	
+	// now let's do the same thing with canvas height
+	var minContentHeight = Math.min($("#toolbar").height(), $("#colourBar").height());
+	$("#canvasContainer canvas").attr("height", minContentHeight);
+};
+
+/**
  * attach events after load
  */
 $(function (){
 	// hide content container
 	//$("#assignmentContainer").hide();
 	
-	// make the canvas smaller on smaller displays
-	if ($(window).width() <= 1024)
-		// the value 500 is not very scientific, but seems to work well on lower-resolution screens
-		$("#canvasContainer canvas").attr("width", "500");
 	
 	var loader = new Loader();
 	loader.createVisuals();
 	loader.configureColourbar();
 	loader.configureToolbar();
+	loader.adjustCanvasSize();
 	loader.configureCanvas();
 	loader.triggerEvents();
 	
