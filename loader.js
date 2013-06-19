@@ -5,21 +5,29 @@
  * This is the main file which adds all the listeners and assigns them events
  */
 
+// create these in global scope so that they are accessible from anywhere
+
 var toolbar = new Toolbar();
 var canvas = new Canvas();
 
 /**
- * attach events after load
+ * This class is responsible for loading the application and attaching events, etc.
  */
-$(function (){
-	/**************************** Change general visuals with JQuery UI ********************************/
+function Loader() {
 	
+}
+
+/**
+ * Create page-wide visuals with JQuery UI
+ */
+Loader.prototype.createVisuals = function () {
 	$("button").button();
-	
-	/**************************** End JQuery UI main body **********************************************/
-	
-	/**************************** Colour Bar Events + JQuery UI ********************************/
-	
+};
+
+/**
+ * Add listeners and JQuery UI properties to the colourbar.
+ */
+Loader.prototype.configureColourbar = function () {
 	toolbar.generateSampleColours();
 	
 	$(".sampleColour").click(function() {
@@ -69,13 +77,12 @@ $(function (){
 		
 		$(".colourField." + type).show().change(); // trigger event on given colourField
 	});
-	
-	// $(".sampleColourContainer").selectable();
-	
-	/**************************** End Colour Bar Events ****************************/
-	
-	/********************* Toolbar button events + JQuery UI ********************/
-	
+};
+
+/**
+ * Add listeners and JQuery UI properties to the toolbar.
+ */
+Loader.prototype.configureToolbar = function () {
 	$("#toolContainer").buttonsetv();
 	
 	$("#clearButton").click(function() { canvas.clearAll(); });
@@ -90,10 +97,6 @@ $(function (){
 		var colour = Utils.randomColour().substring(1);
 		toolbar.setColourFromExternal(colour);
 	});
-	
-	/********************* End toolbar button events ********************/
-	
-	/********************* Toolbar change events **********************/
 	
 	$(".drawtoolButton").change(function() {
 		toolbar.setTool(this.value);
@@ -110,11 +113,12 @@ $(function (){
 			toolbar.previewColour();
 		});
 	});
-		
-	/********************* End toolbar change events **********************/
-	
-	/************************ Canvas mouse events *******************/
-	
+};
+
+/**
+ * Add listeners and JQuery UI properties to the canvas.
+ */
+Loader.prototype.configureCanvas = function () {
 	$("#previewCanvas").mousedown(function (e) {
 		var coords = Utils.toCanvasCoords(e);
 		
@@ -173,14 +177,25 @@ $(function (){
 	   		canvas.endPreviewShape();
 		}
 	});
-	
-	/************************ End canvas mouse events *******************/
-	
-	/************************ Trigger events ***************************/
-	
+};
+
+/**
+ * Trigger the events associated with the checked buttons.
+ */
+Loader.prototype.triggerEvents = function() {
 	$(".drawtoolButton:checked").change();
 	$(".colourType:checked").change();
-	
-	/************************ End trigger events ***********************/
+};
+
+/**
+ * attach events after load
+ */
+$(function (){
+	var loader = new Loader();
+	loader.createVisuals();
+	loader.configureColourbar();
+	loader.configureToolbar();
+	loader.configureCanvas();
+	loader.triggerEvents();
 });
 
