@@ -1,6 +1,11 @@
 CSC309 Assignment 1
 ====================
 
+## Collaborators
+
+* Daniel Kats - g1dbkats, 997492468
+* Paul Patrushev - g1patrus, 997662417
+
 This repo contains the code for the first assignment in CSC309.
 
 * [Description of A1](http://www.cs.toronto.edu/~delara/courses/csc309/)
