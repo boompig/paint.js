@@ -269,7 +269,7 @@ Canvas.prototype.deselectShape = function () {
 	
 	$("#eraseShapeButton").button({disabled: true});
 	$("#copyShapeButton").button({disabled: true});
-	$("#applyColoursButton").hide();
+	toolbar.showApplyButton(false);
 	
 	if (toolbar.tool == "select")
 		$("#colourBar").hide();
@@ -386,7 +386,7 @@ Canvas.prototype.recolourSelectedShape = function () {
 		this._drawPreviewShapeStack();
 		
 		// now disable the apply button
-		$("#applyColoursButton").button({disabled: true});
+		toolbar.enableApplyButton(false);
 	} else {
 		alert("Error - nothing selected");
 	}

@@ -7,14 +7,15 @@
 
 // create these in global scope so that they are accessible from anywhere
 
-var toolbar = new Toolbar();
+var help = new Help(); // needs to be above the toolbar so toolbar has access to help methods
+var toolbar = new Toolbar(); // needs to be above canvas, so canvas has access to toolbar methods
 var canvas = new Canvas();
 
 /**
  * This class is responsible for loading the application and attaching events, etc.
  */
 function Loader() {
-	
+	// empty constructor
 }
 
 /**
@@ -107,16 +108,13 @@ Loader.prototype.configureToolbar = function () {
 	});
 	
 	$(".drawtoolButton").change(function() {
+		help.hide();
 		toolbar.setTool(this.value);
 		if (this.value != "select")
 			canvas.deselectShape();
 	});
 	
 	$(".userField").each(function(i, elem) {
-		$(elem).change(function(e) {
-			toolbar.previewColour();
-		});
-		
 		$(elem).change(function(e) {
 			toolbar.previewColour();
 		});
@@ -129,6 +127,7 @@ Loader.prototype.configureToolbar = function () {
 Loader.prototype.configureCanvas = function () {
 	$("#previewCanvas").mousedown(function (e) {
 		var coords = Utils.toCanvasCoords(e);
+		help.hide();
 		
 		if (toolbar.tool == "select") {
 			canvas.trySelect(coords);
@@ -173,6 +172,7 @@ Loader.prototype.configureCanvas = function () {
 			canvas.endMoveSelectedShape();
 		} else if (canvas.currentShape) {
 	   		canvas.endPreviewShape(Utils.toCanvasCoords(e));
+	   		help.selectHelpMessage();
 		}
 	});
 	
@@ -185,6 +185,13 @@ Loader.prototype.configureCanvas = function () {
 	   		canvas.endPreviewShape();
 		}
 	});
+};
+
+/**
+ * Make the help pane look normal.
+ */
+Loader.prototype.configureHelp = function () {
+	help.hide();
 };
 
 /**
@@ -204,9 +211,6 @@ Loader.prototype.adjustCanvasSize = function() {
 	var freeSpace = $(window).width() - contentWidth;
 	var idealFreeSpace = 100; // very scientifically arrived at this value with 0 guesswork
 	
-	// console.log($(window).width());
-	// console.log(contentWidth);
-	
 	var expandWidth = freeSpace - idealFreeSpace;
 	var canvasWidth = Number($("#canvasContainer canvas").attr("width"));
 	var newCanvasWidth = canvasWidth + expandWidth;
@@ -216,16 +220,14 @@ Loader.prototype.adjustCanvasSize = function() {
 		newCanvasWidth = 300; // this is basically the smallest usable size
 	}
 	
-	// console.log(freeSpace);
-	// console.log(expandWidth);
-	// console.log(canvasWidth);
-	// console.log(newCanvasWidth);
-	
 	$("#canvasContainer canvas").attr("width", newCanvasWidth);
 	
 	// now let's do the same thing with canvas height
 	var minContentHeight = Math.min($("#toolbar").height(), $("#colourBar").height());
 	$("#canvasContainer canvas").attr("height", minContentHeight);
+	
+	// also adjust the size of the help bar
+	$("#helpContainer").css("width", newCanvasWidth - 40);
 };
 
 /**
@@ -240,6 +242,7 @@ $(function (){
 	loader.configureToolbar();
 	loader.adjustCanvasSize();
 	loader.configureCanvas();
+	loader.configureHelp();
 	loader.triggerEvents();
 });
 

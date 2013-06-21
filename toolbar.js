@@ -22,6 +22,39 @@ function Toolbar() {
 }
 
 /**
+ * Show the apply button.
+ * @param {boolean} show True to show button. If not set, show the button.
+ */
+Toolbar.prototype.showApplyButton = function(show) {
+	if (show === undefined || show === true) {
+		$("#applyColoursButton").show();
+	} else {
+		$("#applyColoursButton").hide();
+		help.hide();
+	}
+	
+	// return the toolbar object to allow for chaining
+	return this;
+};
+
+/**
+ * Enable the apply button.
+ * @param {boolean} enable True to enable button. If not set, enable the button.
+ */
+Toolbar.prototype.enableApplyButton = function(enable) {
+	if (enable === undefined || enable === true) {
+		$("#applyColoursButton").button({disabled: 0});
+		help.applyHelpMessage();
+	} else {
+		$("#applyColoursButton").button({disabled: true});
+		help.hide();
+	}
+	
+	// return the toolbar object to allow for chaining
+	return this;
+};
+
+/**
  * Update the display which shows which tool is selected.
  * @param {String} toolText The name of the tool.
  */
@@ -39,7 +72,7 @@ Toolbar.prototype.setTool = function(toolText) {
 	
 	if (this.tool != "select") {
 		// hide when there is no select
-		$("#applyColoursButton").hide();
+		this.showApplyButton(false);
 		// shape being worked on has changed
 		this.currentShape = false;
 		$("#colourBar").show();
@@ -86,7 +119,7 @@ Toolbar.prototype.setPreview = function(shape) {
 	this.setColourFromSliders(); // trigger colour-related on-change events
 	
 	// dirty hack (corrects for other hack in setColourFromExternal)
-	$("#applyColoursButton").button({disabled: true});
+	this.enableApplyButton(false);
 };
 
 /**
@@ -103,7 +136,8 @@ Toolbar.prototype.setColourFromExternal = function(colour, ignoreSliders) {
 		
 	// dirty hack
 	if(this.tool == "selected" && this.currentShape)
-	$("#applyColoursButton").button({disabled: false});
+		this.enableApplyButton();
+		
 	this.previewColour();
 }
 
@@ -191,8 +225,8 @@ Toolbar.prototype.previewColour = function() {
 		var shape;
 		
 		if (this.tool == "select" && this.currentShape) {
-			$("#applyColoursButton").show().button({disabled: false});
-			
+			this.enableApplyButton().showApplyButton();
+		
 			shape = this.currentShape;
 			
 			// should be negative if shape.lineWidth is less than new
@@ -212,7 +246,7 @@ Toolbar.prototype.previewColour = function() {
 		
 		shape.draw(this.context);
 	} else {
-		$("#applyColoursButton").button({disabled: true});
+		this.enableApplyButton(false);
 	}
 };
 

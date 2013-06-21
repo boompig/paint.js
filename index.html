@@ -22,6 +22,7 @@
 		<script src="shape.js"></script>
 		
 		<!-- wrappers for GUI objects -->
+		<script src="help.js"></script>
 		<script src="toolbar.js"></script>
 		<script src="canvas.js"></script>
 	</head>
@@ -56,6 +57,12 @@
 					<canvas id="previewCanvas" width="580", height="400"><!-- nothing here--></canvas>
 				</div>
 				<div id="canvasCoords"><!-- auto-gen --></div>
+				<div id="helpContainer" class="ui-state-highlight ui-corner-all" style="display: none;">
+					<p>
+						<span class="ui-icon ui-icon-info"><!-- nothing here --></span>
+						<span id="helpMsg"><!-- auto-gen --></span>
+					</p>
+				</div> <!-- end helpContainer -->
 			</div> <!-- end container -->
 			
 			<div id="colourBar" class="sidebar">

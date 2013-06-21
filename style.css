@@ -137,3 +137,18 @@ fieldset {
 	/* grey */
 	border: 1px solid #888888;
 }
+
+#helpContainer {
+	margin-top: 10px;
+	padding: 5px;
+	/*width*/
+}
+
+#helpContainer .ui-icon {
+	float: left;
+	margin-right: 5px;
+}
+
+#helpContainer #helpMsg {
+	/*float: left;*/
+}
