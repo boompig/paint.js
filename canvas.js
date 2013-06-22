@@ -390,4 +390,4 @@ Canvas.prototype.recolourSelectedShape = function () {
 	} else {
 		alert("Error - nothing selected");
 	}
-}
+};

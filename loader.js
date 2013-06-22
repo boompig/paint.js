@@ -46,14 +46,8 @@ Loader.prototype.configureColourbar = function () {
 		active: false,
 		heightStyle: "content",
 		autoHeight: false,
-		clearStyle: true
-	});
-	
-	$("#accordion").bind("mouseleave", function() {
-		$(this).accordion({"active" : false});
-	}).bind("mouseover", function() {
-		// open the accordion (true doesn't work, have to specify index, which is 0)
-		$(this).accordion({"active" : 0});
+		clearStyle: true,
+		event: "click hoverintent"
 	});
 	
 	 $("#redSlider, #greenSlider, #blueSlider").slider({
