@@ -70,18 +70,20 @@ Utils.randomColour = function () {
 Utils.minLineSegmentDist = function (line, p) {
     "use strict";
     // rename for ease of use
-    var a = line.drawStart, b = line.drawEnd;
+    var a = line.drawStart, b = line.drawEnd, v, r, l, t;
 
     // let v be the vector from a to b
-    var v = b.sub(a);
+    v = b.sub(a);
     // let r be the vector from a to p
-    var r = p.sub(a);
+    r = p.sub(a);
     // let l be the length of vector v
-    var l = v.size();
+    l = v.size();
 
-    if (l == 0) return r.size();
+    if (l == 0) {
+        return r.size();
+    }
 
-    var t = r.projectScalar(v, r) / l;
+    t = r.projectScalar(v, r) / l;
 
     if (t < 0) {
         // before a
@@ -108,17 +110,18 @@ Utils.minLineSegmentDist = function (line, p) {
  */
 Utils.hexFromRGB = function (r, g, b) {
     "use strict";
-     var hex = [
-        Number(r).toString( 16 ),
-        Number(g).toString( 16 ),
-        Number(b).toString( 16 )
+    var i, hex = [
+        Number(r).toString(16),
+        Number(g).toString(16),
+        Number(b).toString(16)
     ];
-    
-    for (var i = 0; i < hex.length; i++) {
-        if (hex[i].length === 1 )
+
+    for (i = 0; i < hex.length; i++) {
+        if (hex[i].length === 1) {
             hex[i] = "0" + hex[i];
+        }
     }
-    
+
     return hex.join("").toUpperCase();
 };
 
@@ -130,11 +133,11 @@ Utils.hexFromRGB = function (r, g, b) {
  */
 Utils.hexToRGB = function (hex) {
     "use strict";
-    
+
     // force to 6 chars
     if (hex.length === 3)
         hex = "0" + hex.split("").join("0");
-        
+
     return [
         parseInt(hex.substring(0, 2), 16),
         parseInt(hex.substring(2, 4), 16),
