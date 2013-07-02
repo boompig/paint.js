@@ -1,5 +1,6 @@
 function Utils() {
-	// empty constructor
+    // empty constructor
+    "use strict";
 }
 
 /**
@@ -8,16 +9,18 @@ function Utils() {
  * @param {String} colour The given colour
  * @returns {boolean}
  */
-Utils.isColour = function(colour) {
-	var pattern = /(^#[0-9A-F]{6}$)|(^#[0-9A-F]{3}$)/i;
-	return pattern.test(colour);
+Utils.isColour = function (colour) {
+    "use strict";
+    var pattern = /(^#[0-9A-F]{6}$)|(^#[0-9A-F]{3}$)/i;
+    return pattern.test(colour);
 };
 
 /**
  * Clear the given canvas.
  */
-Utils.clearCanvas = function(canvas) {
-	canvas.width = canvas.width;
+Utils.clearCanvas = function (canvas) {
+    "use strict";
+    canvas.width = canvas.width;
 };
 
 /**
@@ -25,7 +28,8 @@ Utils.clearCanvas = function(canvas) {
  * Assumed that the event target is the canvas.
  * @returns {Vector}
  */
-Utils.toCanvasCoords = function(evt) {
+Utils.toCanvasCoords = function (evt) {
+    "use strict";
     return new Vector(evt.pageX - $(evt.target).offset().left, evt.pageY - $(evt.target).offset().top);
 };
 
@@ -34,26 +38,27 @@ Utils.toCanvasCoords = function(evt) {
  * @param {Number} a (optional) Hard lower limit
  * @param {Number} b Soft upper limit
  */
-Utils.randInt = function(a, b) {
-	if (b === undefined) {
-		b = a;
-		a = 0;
-	}
-	
-	return Math.floor(Math.random() * (b - a)) + a;
+Utils.randInt = function (a, b) {
+    "use strict";
+    if (b === undefined) {
+        b = a;
+        a = 0;
+    }
+
+    return Math.floor(Math.random() * (b - a)) + a;
 };
 
 /**
  * Return a random hex colour as string.
  * @returns {String}
  */
-Utils.randomColour = function() {
-	var letters = "0123456789ABCDEF".split("");
-    var colour = '#';
-    for (var i = 0; i < 6; i++) {
+Utils.randomColour = function () {
+    "use strict";
+    var letters = "0123456789ABCDEF".split(""), colour = '#', i;
+    for (i = 0; i < 6; i++) {
         colour += letters[this.randInt(0, letters.length)];
     }
-    
+
     return colour;
 };
 
@@ -62,33 +67,34 @@ Utils.randomColour = function() {
  * @param {Shape} line
  * @param {Vector} p
  */
-Utils.minLineSegmentDist = function(line, p) {
-	// rename for ease of use
-	var a = line.drawStart, b = line.drawEnd;
-	
-	// let v be the vector from a to b
-	var v = b.sub(a);
-	// let r be the vector from a to p
-	var r = p.sub(a);
-	// let l be the length of vector v
-	var l = v.size();
-	
-	if (l == 0) return r.size();
-	
-	var t = r.projectScalar(v, r) / l;
-	
-	if (t < 0) {
-		// before a
-		return r.size();
-	} else if (t > 1) {
-		// after b
-		return p.sub(b).size();
-	} else {
-		// between a and b
-		// a + t(b - a)
-		var closestPt = a.add(b.sub(a).mul(t));
-		return closestPt.sub(p).size();
-	}
+Utils.minLineSegmentDist = function (line, p) {
+    "use strict";
+    // rename for ease of use
+    var a = line.drawStart, b = line.drawEnd;
+
+    // let v be the vector from a to b
+    var v = b.sub(a);
+    // let r be the vector from a to p
+    var r = p.sub(a);
+    // let l be the length of vector v
+    var l = v.size();
+
+    if (l == 0) return r.size();
+
+    var t = r.projectScalar(v, r) / l;
+
+    if (t < 0) {
+        // before a
+        return r.size();
+    } else if (t > 1) {
+        // after b
+        return p.sub(b).size();
+    } else {
+        // between a and b
+        // a + t(b - a)
+        var closestPt = a.add(b.sub(a).mul(t));
+        return closestPt.sub(p).size();
+    }
 };
 
 /**
@@ -100,19 +106,20 @@ Utils.minLineSegmentDist = function(line, p) {
  * @param {Number} b Blue colour value
  * @returns {String}
  */
-Utils.hexFromRGB = function(r, g, b) {
-	 var hex = [
-		Number(r).toString( 16 ),
-		Number(g).toString( 16 ),
-		Number(b).toString( 16 )
-	];
-	
-	for (var i = 0; i < hex.length; i++) {
-		if (hex[i].length === 1 )
-			hex[i] = "0" + hex[i];
-	}
-	
-	return hex.join("").toUpperCase();
+Utils.hexFromRGB = function (r, g, b) {
+    "use strict";
+     var hex = [
+        Number(r).toString( 16 ),
+        Number(g).toString( 16 ),
+        Number(b).toString( 16 )
+    ];
+    
+    for (var i = 0; i < hex.length; i++) {
+        if (hex[i].length === 1 )
+            hex[i] = "0" + hex[i];
+    }
+    
+    return hex.join("").toUpperCase();
 };
 
 /**
@@ -122,15 +129,17 @@ Utils.hexFromRGB = function(r, g, b) {
  * @returns {Array}
  */
 Utils.hexToRGB = function (hex) {
-	// force to 6 chars
-	if (hex.length === 3)
-		hex = "0" + hex.split("").join("0");
-		
-	return [
-		parseInt(hex.substring(0, 2), 16),
-		parseInt(hex.substring(2, 4), 16),
-		parseInt(hex.substring(4, 6), 16)
-	];
+    "use strict";
+    
+    // force to 6 chars
+    if (hex.length === 3)
+        hex = "0" + hex.split("").join("0");
+        
+    return [
+        parseInt(hex.substring(0, 2), 16),
+        parseInt(hex.substring(2, 4), 16),
+        parseInt(hex.substring(4, 6), 16)
+    ];
 };
 
 /**
@@ -138,17 +147,18 @@ Utils.hexToRGB = function (hex) {
  * @returns {Array}
  */
 Utils.genMainColours = function () {
-	var a = ["0", "f", "8"];
-	
-	var colours = new Array();
-	
-	for(var r = 0; r < a.length; r++) {
-		for (var g = 0; g < a.length; g++) {
-			for (var b = 0; b < a.length; b++) {
-				colours.push(a[r] + a[g] + a[b]);
-			}
-		}
-	}
-	
-	return colours;
+    "use strict";
+    var a = ["0", "f", "8"];
+    
+    var colours = new Array();
+    
+    for(var r = 0; r < a.length; r++) {
+        for (var g = 0; g < a.length; g++) {
+            for (var b = 0; b < a.length; b++) {
+                colours.push(a[r] + a[g] + a[b]);
+            }
+        }
+    }
+    
+    return colours;
 };
