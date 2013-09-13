@@ -1,12 +1,10 @@
-CSC309 Assignment 1
+Paint.js
 ====================
 
-This repo contains the code for the first assignment in CSC309.
+This is a Paint-clone, though better designed, meant to be run in a browser using the HTML5 canvas.
+Submitted for a U of T undergrad course, I wanted to make this an open-source project, for anyone to use, view, and modify as they please. Though I'd like credit =)
 
-## Collaborators
-
-* Daniel Kats - g1dbkats, 997492468
-* Pavel Patrushev - g1patrus, 997662417
+This project was written in entirety by me, Daniel Kats. Please, hold your applause.
 
 ## Instructions
 
@@ -27,34 +25,6 @@ To change a shape that is already on the canvas, you need to select it with the 
 * To move a shape, click within the shape, then drag and drop
 * To erase a shape, click the 'Erase Shape' button in the left sidebar
 * To copy a shape, click the 'Copy Shape' button in the left sidebar. The new shape will appear next to the previously selected shape
-
-## Assignment Specs
-
-* [Description of A1](http://www.cs.toronto.edu/~delara/courses/csc309/)
-* We can assume fixed screen size: 1024x768
-
-### User can draw shapes
-
-* straight lines
-* circles
-* rectangles
-
-### User sets shape graphics properties
-
-* outline colour
-* fill colour
-* outline width
-
-### Operations with Shapes
-
-* Select a shape (when a shape is selected and actioned-upon, it becomes the top-most shape)
-* Erase the shape.
-* Move the shape to a new position on the canvas.
-* Resize the shape.
-* Change the shape's color, fill, and outline width.
-* Copy and paste. 
-
-
 
 ## Libraries Used
 

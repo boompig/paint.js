@@ -4,23 +4,28 @@
  * @param {Number} y The y-coordinate
  */
 function Vector(x, y) {
-	this.x = x, this.y = y;
+    "use strict";
+
+    this.x = x;
+    this.y = y;
 }
 
 /**
  * Return the squared magnitude of this vector.
  * @returns {Number}
  */
-Vector.prototype.sizeSquared = function() {
-	return Math.pow(this.x, 2) + Math.pow(this.y, 2);
+Vector.prototype.sizeSquared = function () {
+    "use strict";
+    return Math.pow(this.x, 2) + Math.pow(this.y, 2);
 };
 
 /**
  * Return the magnitude of this vector.
  * @returns {Number}
  */
-Vector.prototype.size = function() {
-	return Math.sqrt(this.sizeSquared());
+Vector.prototype.size = function () {
+    "use strict";
+    return Math.sqrt(this.sizeSquared());
 };
 
 /**
@@ -28,8 +33,9 @@ Vector.prototype.size = function() {
  * @param {Vector} v2 The other vector.
  * @returns {Number}
  */
-Vector.prototype.dotProduct = function(v2) {
-	return (v2.x * this.x) + (v2.y * this.y);
+Vector.prototype.dotProduct = function (v2) {
+    "use strict";
+    return (v2.x * this.x) + (v2.y * this.y);
 };
 
 /**
@@ -37,9 +43,10 @@ Vector.prototype.dotProduct = function(v2) {
  * @param {Vector} v2 The other vector.
  * @returns {Number}
  */
-Vector.prototype.projectScalar = function(v2) {
-	// `this <dot> v2` / || v2 ||
-	return Math.abs(this.dotProduct(v2)) / v2.size();
+Vector.prototype.projectScalar = function (v2) {
+    // `this <dot> v2` / || v2 ||
+    "use strict";
+    return Math.abs(this.dotProduct(v2)) / v2.size();
 };
 
 /**
@@ -47,8 +54,9 @@ Vector.prototype.projectScalar = function(v2) {
  * @param {Vector} v2 The other vector.
  * @returns {Vector}
  */
-Vector.prototype.sub = function(v2) {
-	return new Vector(this.x - v2.x, this.y - v2.y);
+Vector.prototype.sub = function (v2) {
+    "use strict";
+    return new Vector(this.x - v2.x, this.y - v2.y);
 };
 
 /**
@@ -56,8 +64,9 @@ Vector.prototype.sub = function(v2) {
  * @param {Vector} v2 The other vector.
  * @returns {Vector}
  */
-Vector.prototype.add = function(v2) {
-	return new Vector(this.x + v2.x, this.y + v2.y);
+Vector.prototype.add = function (v2) {
+    "use strict";
+    return new Vector(this.x + v2.x, this.y + v2.y);
 };
 
 /**
@@ -65,16 +74,18 @@ Vector.prototype.add = function(v2) {
  * @param {Number} c The scalar.
  * @returns {Vector}
  */
-Vector.prototype.mul = function(c) {
-	return new Vector(c * this.x, c * this.y);
+Vector.prototype.mul = function (c) {
+    "use strict";
+    return new Vector(c * this.x, c * this.y);
 };
 
 /**
  * Return the string representation of this Vector
  * @returns {String}
  */
-Vector.prototype.toString = function() {
-	return "(" + Math.round(this.x) + ", " + Math.round(this.y) + ")"; 
+Vector.prototype.toString = function () {
+    "use strict";
+    return "(" + Math.round(this.x) + ", " + Math.round(this.y) + ")";
 };
 
 /**
@@ -82,7 +93,8 @@ Vector.prototype.toString = function() {
  * @returns {boolean}
  */
 Vector.prototype.isZero = function () {
-	return this.x === 0 && this.y === 0;
+    "use strict";
+    return this.x === 0 && this.y === 0;
 };
 
 /**
@@ -90,7 +102,8 @@ Vector.prototype.isZero = function () {
  * @returns {Vector}
  */
 Vector.prototype.copy = function () {
-	return new Vector(this.x, this.y);
+    "use strict";
+    return new Vector(this.x, this.y);
 };
 
 /**
@@ -98,19 +111,22 @@ Vector.prototype.copy = function () {
  * @param {Vector} v2 Another vector.
  * @returns {bool}
  */
-Vector.prototype.equals = function(v2) {
-	return this.x == v2.x && this.y == v2.y;
+Vector.prototype.equals = function (v2) {
+    "use strict";
+    return this.x === v2.x && this.y === v2.y;
 };
 
 /**
  * Return a new unit vector in the same direction as this vector.
  * @returns {Vector}
  */
-Vector.prototype.unitVector = function() {
-	var v = this.copy();
-	
-	if (v.isZero())
-		return v;
-	else
-		return v.mul(1 / v.size());
+Vector.prototype.unitVector = function () {
+    "use strict";
+    var v = this.copy();
+
+    if (v.isZero()) {
+        return v;
+    }
+
+    return v.mul(1 / v.size());
 };
